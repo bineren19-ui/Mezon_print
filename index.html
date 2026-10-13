@@ -1,0 +1,2550 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f5f5f7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<title>Накладные — Mezon Print</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* =========================================================
+   ТЕМА ПРИЛОЖЕНИЯ — в духе Apple / Tesla
+   ========================================================= */
+:root{
+  color-scheme: light dark;
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display",Inter,"Segoe UI Variable Text","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --bg:#f5f5f7;
+  --panel:#ffffff;
+  --panel-elev:#ffffff;
+  --field:#f5f5f7;
+  --field-hover:#ececf0;
+  --seg-on:#ffffff;
+  --text:#1d1d1f;
+  --muted:#6e6e73;
+  --faint:#86868b;
+  --hair:rgba(0,0,0,.08);
+  --accent:#0071e3;
+  --accent-hover:#0077ed;
+  --accent-soft:rgba(0,113,227,.14);
+  --danger:#ff3b30;
+  --green:#34c759;
+  --orange:#ff9f0a;
+  --green-text:#248a3d;
+  --red-text:#d70015;
+  --switch-off:rgba(120,120,128,.16);
+  --secondary:rgba(0,0,0,.05);
+  --secondary-hover:rgba(0,0,0,.08);
+  --bar:rgba(255,255,255,.72);
+  --preview-bg:#e8e8ed;
+  --shadow-card:0 1px 2px rgba(0,0,0,.03);
+  --radius:20px;
+  --ease:cubic-bezier(.25,.1,.25,1);
+  --spring:cubic-bezier(.32,.72,0,1);
+  --spring-pop:cubic-bezier(.34,1.56,.64,1);
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#000000;
+    --panel:#1c1c1e;
+    --panel-elev:#2c2c2e;
+    --field:#2c2c2e;
+    --field-hover:#3a3a3c;
+    --seg-on:#636366;
+    --text:#f5f5f7;
+    --muted:#98989d;
+    --faint:#8e8e93;
+    --hair:rgba(255,255,255,.09);
+    --accent:#2997ff;
+    --accent-hover:#47a6ff;
+    --accent-soft:rgba(41,151,255,.22);
+    --danger:#ff453a;
+    --green:#30d158;
+    --orange:#ff9f0a;
+    --green-text:#30d158;
+    --red-text:#ff6961;
+    --switch-off:rgba(120,120,128,.32);
+    --secondary:rgba(255,255,255,.08);
+    --secondary-hover:rgba(255,255,255,.13);
+    --bar:rgba(22,22,23,.72);
+    --preview-bg:#0b0b0c;
+    --shadow-card:none;
+  }
+}
+
+*{box-sizing:border-box}
+[hidden]{display:none !important}
+html,body{margin:0;height:100%}
+body{
+  font-family:var(--font);
+  background:var(--bg);
+  color:var(--text);
+  font-size:14px;
+  letter-spacing:-.01em;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
+button,input,textarea{font:inherit;letter-spacing:inherit}
+svg{display:block}
+::selection{background:var(--accent-soft)}
+
+.app{display:flex;flex-direction:column;height:100vh;height:100dvh}
+
+/* ---------- Анимации ---------- */
+@keyframes rise{
+  from{opacity:0;transform:translateY(22px) scale(.985);filter:blur(6px)}
+  to{opacity:1;transform:none;filter:none}
+}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
+@keyframes grow{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+@keyframes draw{to{stroke-dashoffset:0}}
+@keyframes pop{0%{transform:scale(1)}35%{transform:scale(1.07)}100%{transform:scale(1)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+body.intro .app-bar{animation:fadeDown .7s var(--spring) both}
+body.intro .ed-head,
+body.intro .editor>.card,
+body.intro .kbd{animation:rise .9s var(--spring) both;animation-delay:calc(var(--i,0) * 70ms + 80ms)}
+body.intro .pv-toolbar{animation:fadeIn .8s var(--ease) .3s both}
+body.intro .sheet-holder{animation:rise 1.1s var(--spring) .18s both}
+
+/* ---------- Верхняя панель (стекло) ---------- */
+.app-bar{
+  display:flex;align-items:center;gap:12px;
+  height:56px;padding:0 24px;
+  background:var(--bar);
+  -webkit-backdrop-filter:saturate(180%) blur(20px);
+  backdrop-filter:saturate(180%) blur(20px);
+  border-bottom:1px solid var(--hair);
+  flex-shrink:0;position:relative;z-index:5;
+}
+.brand{display:flex;align-items:center;gap:14px;margin-right:auto;min-width:0}
+.brand-mark{height:28px;display:flex;align-items:center;color:var(--text);flex-shrink:0}
+.brand-mark svg,.brand-mark img{height:28px;width:auto;max-width:90px;object-fit:contain}
+.brand-text{min-width:0;display:grid;overflow:hidden}
+.bt-default,.bt-compact{
+  grid-area:1/1;display:flex;align-items:baseline;gap:8px;min-width:0;white-space:nowrap;
+  transition:opacity .35s var(--ease),transform .55s var(--spring);
+}
+.bt-compact{opacity:0;transform:translateY(10px);pointer-events:none;font-weight:600;font-size:15px;letter-spacing:-.02em}
+.bt-compact span:last-child{color:var(--muted);font-weight:500}
+.app-bar.scrolled .bt-default{opacity:0;transform:translateY(-10px)}
+.app-bar.scrolled .bt-compact{opacity:1;transform:none}
+.brand-title{font-weight:600;font-size:17px;letter-spacing:-.022em}
+.brand-sub{font-size:13px;color:var(--muted);overflow:hidden;text-overflow:ellipsis}
+.bar-actions{display:flex;gap:8px;flex-shrink:0}
+
+/* ---------- Кнопки ---------- */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  height:36px;padding:0 16px;
+  border-radius:980px;border:0;
+  background:var(--secondary);color:var(--text);
+  font-weight:500;font-size:14px;
+  cursor:pointer;white-space:nowrap;user-select:none;
+  transition:background .25s var(--ease),color .25s,transform .35s var(--spring),opacity .2s;
+}
+.btn:hover{background:var(--secondary-hover)}
+.btn:active{transform:scale(.95);transition-duration:.1s}
+.btn:focus-visible,.icon-btn:focus-visible,.seg button:focus-visible,.saved-open:focus-visible,.item-n:focus-visible,.col:focus-visible{outline:none;box-shadow:0 0 0 4px var(--accent-soft)}
+.btn svg{width:16px;height:16px;flex-shrink:0}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent-hover)}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-danger:hover{background:var(--danger);opacity:.9}
+.btn.small{height:32px;padding:0 14px;font-size:13px}
+.btn.link{background:transparent;color:var(--accent);padding:0 6px}
+.btn.link:hover{text-decoration:underline;background:transparent}
+.btn.done{background:var(--green);color:#fff;animation:pop .55s var(--spring-pop)}
+.btn.done svg path{stroke-dasharray:22;stroke-dashoffset:22;animation:draw .5s .08s var(--ease) forwards}
+
+/* ---------- Вкладки (мобильные) ---------- */
+.tabs{display:none;padding:8px 16px;background:var(--bar);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid var(--hair);flex-shrink:0}
+.tabs .seg{flex:1;height:34px}
+
+/* ---------- Раскладка ---------- */
+.layout{flex:1;display:grid;grid-template-columns:minmax(380px,460px) 1fr;min-height:0}
+.editor{overflow-y:auto;padding:24px 20px 40px;scrollbar-width:thin;scroll-behavior:smooth}
+.preview{
+  overflow:auto;padding:32px;
+  background:var(--preview-bg);
+  display:flex;justify-content:center;align-items:flex-start;
+}
+.pv-inner{display:flex;flex-direction:column;gap:12px;width:max-content}
+.pv-toolbar{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--muted);gap:12px;font-weight:500}
+.save-state{display:inline-flex;align-items:center;gap:7px;transition:color .3s}
+.save-state::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--faint);transition:background .4s,transform .4s var(--spring-pop)}
+.save-state.ok::before{background:var(--green)}
+.save-state.warn::before{background:var(--orange)}
+.sheet-holder{position:relative;overflow:hidden;background:#fff;border-radius:4px;box-shadow:0 2px 6px rgba(0,0,0,.04),0 30px 60px -10px rgba(0,0,0,.18);flex-shrink:0}
+
+/* ---------- Заголовки и карточки ---------- */
+.ed-head{padding:4px 4px 20px}
+.ed-head h1{margin:0;font-size:28px;font-weight:700;letter-spacing:-.03em;line-height:1.1;word-break:break-word}
+.ed-head p{margin:6px 0 0;color:var(--muted);font-size:14px;transition:color .3s}
+
+.card{background:var(--panel);border-radius:var(--radius);padding:20px;margin-bottom:16px;box-shadow:var(--shadow-card)}
+.card h3{
+  margin:0 0 16px;font-size:17px;font-weight:600;letter-spacing:-.022em;
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+}
+.pill{font-size:12px;font-weight:600;background:var(--field);color:var(--muted);border-radius:999px;padding:2px 9px;letter-spacing:0;font-variant-numeric:tabular-nums}
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;min-width:0}
+.field:last-child{margin-bottom:0}
+.field>label,.lbl{font-size:12px;color:var(--muted);font-weight:500;padding-left:2px}
+.in{
+  width:100%;height:40px;padding:0 12px;
+  border:0;border-radius:10px;
+  background:var(--field);color:var(--text);
+  font-size:15px;outline:none;
+  transition:background .2s,box-shadow .25s var(--ease);
+  min-width:0;
+}
+textarea.in{height:auto;min-height:76px;padding:10px 12px;resize:vertical;line-height:1.45;display:block}
+.in::placeholder{color:var(--faint)}
+.in:hover{background:var(--field-hover)}
+.in:focus{background:var(--panel);box-shadow:0 0 0 1px var(--accent),0 0 0 4px var(--accent-soft)}
+.in:disabled{opacity:.45;cursor:not-allowed}
+.in.r{text-align:right;font-variant-numeric:tabular-nums}
+.in[type=number]{-moz-appearance:textfield}
+.in[type=number]::-webkit-inner-spin-button,.in[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.row{display:flex;gap:8px;align-items:center}
+.row .in{flex:1}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.hint{font-size:12px;color:var(--muted);margin:10px 2px 0;line-height:1.5}
+
+/* сегментированный переключатель со скользящей плашкой */
+.seg{position:relative;display:flex;background:var(--field);border-radius:10px;padding:2px;height:40px}
+.seg button{position:relative;z-index:1;flex:1;border:0;background:transparent;border-radius:8px;font-size:13px;font-weight:500;color:var(--text);cursor:pointer;padding:0 8px;white-space:nowrap;transition:color .2s}
+.seg button:not(.on){color:var(--muted)}
+.seg button.on{font-weight:600}
+.seg-thumb{position:absolute;top:2px;bottom:2px;left:0;width:0;border-radius:8px;background:var(--seg-on);box-shadow:0 3px 8px rgba(0,0,0,.12),0 3px 1px rgba(0,0,0,.04);pointer-events:none}
+.seg.ready .seg-thumb{transition:transform .5s var(--spring),width .5s var(--spring)}
+.seg.small{height:32px}
+.seg.small button{font-size:12.5px}
+.seg.mini{height:32px;width:96px;flex-shrink:0}
+.seg.mini button{padding:0 4px;font-size:12.5px}
+
+/* переключатель iOS */
+.switch{
+  appearance:none;-webkit-appearance:none;
+  width:51px;height:31px;border-radius:999px;margin:0;
+  background:var(--switch-off);position:relative;cursor:pointer;flex-shrink:0;
+  transition:background .3s var(--ease);
+}
+.switch::after{
+  content:"";position:absolute;top:2px;left:2px;width:27px;height:27px;border-radius:50%;
+  background:#fff;box-shadow:0 3px 8px rgba(0,0,0,.15),0 1px 1px rgba(0,0,0,.16);
+  transition:transform .45s var(--spring),width .25s var(--spring);
+}
+.switch:active::after{width:33px}
+.switch:checked:active::after{transform:translateX(14px)}
+.switch:checked{background:var(--green)}
+.switch:checked::after{transform:translateX(20px)}
+.switch:focus-visible{outline:none;box-shadow:0 0 0 4px var(--accent-soft)}
+.list-row{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:44px}
+.list-row>label{font-size:15px;font-weight:500;cursor:pointer}
+.row-end{display:flex;align-items:center;gap:10px}
+
+.icon-btn{
+  width:34px;height:34px;border-radius:50%;
+  border:0;background:transparent;color:var(--faint);
+  display:grid;place-items:center;cursor:pointer;flex-shrink:0;
+  transition:background .2s,color .2s,transform .3s var(--spring);
+}
+.icon-btn:active{transform:scale(.88);transition-duration:.1s}
+.icon-btn svg{width:16px;height:16px}
+.icon-btn:hover{background:var(--secondary);color:var(--text)}
+.icon-btn.filled{background:var(--field);color:var(--text);width:40px;height:40px;border-radius:10px}
+.icon-btn.filled:hover{background:var(--field-hover)}
+.icon-btn.filled.spin svg{animation:spin .6s var(--spring)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.icon-btn.danger:hover{color:var(--danger);background:rgba(255,59,48,.1)}
+.icon-btn.ok:hover{color:var(--green-text);background:rgba(52,199,89,.12)}
+
+/* ---------- Позиции ---------- */
+#items{margin-top:-10px}
+.item{padding:12px 0;border-bottom:1px solid var(--hair);background:var(--panel);position:relative}
+.item:last-child{border-bottom-color:transparent}
+.item-head{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.item-n{
+  flex:0 0 24px;height:24px;border-radius:50%;border:0;padding:0;
+  background:var(--field);display:grid;place-items:center;
+  font-size:11px;font-weight:600;color:var(--muted);font-variant-numeric:tabular-nums;
+  cursor:grab;touch-action:none;transition:background .2s,color .2s,transform .3s var(--spring);
+}
+.item-n .grip{display:none;width:12px;height:12px}
+.item-n:hover{background:var(--field-hover);color:var(--text)}
+.item-n:hover .n{display:none}
+.item-n:hover .grip{display:block}
+.item.dragging{z-index:5;scale:1.02;border-radius:14px;border-bottom-color:transparent;box-shadow:0 18px 40px rgba(0,0,0,.18),0 0 0 1px var(--hair);transition:scale .35s var(--spring),box-shadow .35s var(--ease)}
+.item.dragging .item-n{cursor:grabbing;background:var(--accent);color:#fff}
+.items-sorting{user-select:none}
+.items-sorting .item:not(.dragging){transition:transform .4s var(--spring)}
+.item-grid{display:grid;grid-template-columns:72px 1fr 1.25fr 1.25fr;gap:8px;align-items:end;padding-left:32px}
+.item-grid label{display:flex;flex-direction:column;gap:4px;min-width:0}
+.item-grid label span,.item-sum span{font-size:11px;color:var(--muted);font-weight:500;padding-left:2px}
+.item-sum{display:flex;flex-direction:column;gap:4px;align-items:flex-end;min-width:0}
+.item-sum b{height:40px;display:flex;align-items:center;font-variant-numeric:tabular-nums;font-size:15px;font-weight:600;white-space:nowrap}
+.item-head .icon-btn{width:30px;height:30px}
+.add-btn{width:100%;height:44px;margin-top:8px;color:var(--accent);background:var(--accent-soft);border-radius:12px}
+.add-btn:hover{background:var(--accent-soft);opacity:.85}
+
+.vat-rate{display:flex;align-items:center;gap:6px;width:92px}
+.vat-rate span{color:var(--muted)}
+.opts{margin-top:16px;padding-top:6px;border-top:1px solid var(--hair)}
+.opts .list-row+.list-row{border-top:1px solid var(--hair)}
+.disc-in{width:110px}
+
+/* ---------- Итог (крупно, как цена у Tesla) ---------- */
+.total-card{padding:24px 20px}
+.sum-lines{display:flex;flex-direction:column;gap:8px}
+.sum-lines div{display:flex;justify-content:space-between;align-items:baseline;color:var(--muted);font-size:14px}
+.sum-lines b{color:var(--text);font-weight:500;font-variant-numeric:tabular-nums}
+.grand{margin-top:16px;padding-top:16px;border-top:1px solid var(--hair)}
+.grand-label{font-size:13px;color:var(--muted);font-weight:500}
+.grand-value{font-size:36px;font-weight:700;letter-spacing:-.035em;line-height:1.15;margin-top:2px;word-break:break-word}
+.grand-words{font-size:12.5px;color:var(--muted);margin-top:6px;line-height:1.45}
+
+/* ---------- Статистика ---------- */
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.stat{background:var(--field);border-radius:14px;padding:12px 14px;min-width:0}
+.stat-label{font-size:12px;color:var(--muted);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stat-value{font-size:21px;font-weight:650;letter-spacing:-.03em;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stat-sub{font-size:12px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.delta{font-weight:600}
+.delta.up{color:var(--green-text)}
+.delta.down{color:var(--red-text)}
+.chart{position:relative;margin-top:22px;padding:18px 0 26px 52px}
+.chart-title{font-size:12px;color:var(--muted);font-weight:500;margin:20px 0 0}
+.chart-plot{position:relative;height:120px}
+.gl{position:absolute;left:0;right:0;border-top:1px solid var(--hair)}
+.gl span{position:absolute;right:calc(100% + 8px);top:-8px;font-size:11px;color:var(--faint);font-variant-numeric:tabular-nums;white-space:nowrap}
+.chart-cols{position:absolute;inset:0;display:flex}
+.col{flex:1;position:relative;display:flex;justify-content:center;align-items:flex-end;outline:none;border-radius:6px}
+.bar{width:min(24px,60%);border-radius:4px 4px 0 0;background:color-mix(in srgb,var(--accent) 40%,var(--panel));transform-origin:bottom;animation:grow .9s var(--spring) both;animation-delay:calc(var(--i) * 60ms);transition:filter .2s}
+.col.cur .bar{background:var(--accent)}
+.col:hover .bar,.col:focus-visible .bar{filter:brightness(1.12)}
+.col-x{position:absolute;top:calc(100% + 8px);font-size:11px;color:var(--muted)}
+.col.cur .col-x{color:var(--text);font-weight:600}
+.col-val{position:absolute;font-size:11px;font-weight:600;color:var(--text);white-space:nowrap;animation:fadeIn .5s .5s both}
+.chart-tip{
+  position:absolute;z-index:3;pointer-events:none;
+  background:var(--panel-elev);color:var(--text);
+  box-shadow:0 10px 30px rgba(0,0,0,.18),0 0 0 1px var(--hair);
+  border-radius:10px;padding:8px 10px;font-size:12px;line-height:1.4;white-space:nowrap;
+  transform:translate(-50%,calc(-100% + 4px));opacity:0;
+  transition:opacity .18s,transform .3s var(--spring);
+}
+.chart-tip.show{opacity:1;transform:translate(-50%,-100%)}
+.chart-tip b{font-weight:600}
+.chart-tip span{color:var(--muted)}
+.chart-table summary{font-size:12px;color:var(--accent);cursor:pointer;list-style:none;margin-top:4px}
+.chart-table summary::-webkit-details-marker{display:none}
+.chart-table table{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:8px}
+.chart-table th{text-align:left;color:var(--muted);font-weight:500;padding:6px 0;border-bottom:1px solid var(--hair)}
+.chart-table td{padding:6px 0;border-bottom:1px solid var(--hair);font-variant-numeric:tabular-nums}
+.chart-table .r{text-align:right}
+
+/* ---------- Сохранённые ---------- */
+.saved-tools{display:flex;flex-direction:column;gap:8px}
+.saved-list{margin-top:10px;display:flex;flex-direction:column;max-height:380px;overflow-y:auto;margin-left:-8px;margin-right:-8px;padding:2px 0}
+.saved{display:flex;align-items:center;gap:0;border-radius:12px;padding:2px 6px 2px 0;transition:background .25s}
+.saved+.saved{margin-top:2px}
+.saved:hover{background:var(--field)}
+.saved.active{background:var(--accent-soft)}
+.saved-open{flex:1;min-width:0;text-align:left;border:0;background:transparent;color:var(--text);padding:9px 12px;cursor:pointer;display:grid;grid-template-columns:1fr auto;column-gap:10px;row-gap:2px;border-radius:12px}
+.s-num{font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.s-sum{font-weight:600;font-size:14px;font-variant-numeric:tabular-nums;white-space:nowrap;text-align:right}
+.s-client{font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.s-meta{font-size:12px;color:var(--faint);text-align:right;white-space:nowrap;display:flex;align-items:center;gap:5px;justify-content:flex-end}
+.s-dot{width:7px;height:7px;border-radius:50%;background:var(--orange);display:inline-block;flex-shrink:0}
+.s-dot.paid{background:var(--green)}
+.saved{position:relative}
+.saved .icon-btn{width:30px;height:30px}
+.saved-actions{display:flex;gap:2px;flex-shrink:0}
+@media (hover:hover){
+  .saved{padding-right:0}
+  .saved-actions{
+    position:absolute;right:8px;top:50%;
+    transform:translate(8px,-50%) scale(.96);opacity:0;pointer-events:none;
+    padding:3px;border-radius:999px;background:var(--panel-elev);
+    box-shadow:0 6px 18px rgba(0,0,0,.12),0 0 0 1px var(--hair);
+    transition:opacity .25s var(--ease),transform .45s var(--spring);
+  }
+  .saved:hover .saved-actions,.saved:focus-within .saved-actions{opacity:1;transform:translate(0,-50%);pointer-events:auto}
+}
+.empty-note{font-size:14px;color:var(--muted);padding:20px 8px;line-height:1.5;text-align:center}
+.saved-foot{display:flex;justify-content:space-between;align-items:center;margin-top:12px;gap:8px}
+.saved-foot .hint{margin:0}
+
+/* ---------- Настройки ---------- */
+details.card summary{list-style:none;cursor:pointer;user-select:none}
+details.card summary::-webkit-details-marker{display:none}
+details.card summary h3{margin:0}
+details.card summary svg{width:18px;height:18px;color:var(--faint);transition:transform .5s var(--spring)}
+details[open].card summary svg{transform:rotate(180deg)}
+.details-body{padding-top:18px}
+.asset{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.asset-prev{width:76px;height:48px;border-radius:10px;background:#fff;display:grid;place-items:center;padding:5px;overflow:hidden;box-shadow:inset 0 0 0 1px var(--hair)}
+.asset-prev svg,.asset-prev img{max-width:100%;max-height:100%;width:auto;height:100%;object-fit:contain}
+.asset-prev.stamp{color:#2f6fc0}
+.sub-section{padding-top:14px;margin-top:14px;border-top:1px solid var(--hair)}
+
+.kbd{font-size:12px;color:var(--faint);line-height:1.8;padding:4px 6px;text-align:center}
+.kbd kbd{font:inherit;font-size:11px;font-weight:600;background:var(--panel);color:var(--muted);border-radius:5px;padding:1px 6px;box-shadow:0 1px 0 var(--hair),0 0 0 1px var(--hair)}
+
+/* ---------- Уведомление ---------- */
+.toast{
+  position:fixed;left:50%;bottom:calc(28px + env(safe-area-inset-bottom));z-index:50;
+  transform:translate(-50%,24px) scale(.94);opacity:0;pointer-events:none;
+  display:flex;align-items:center;gap:16px;
+  background:rgba(29,29,31,.88);color:#f5f5f7;
+  -webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);
+  padding:12px 20px;border-radius:999px;font-weight:500;font-size:14px;
+  box-shadow:0 12px 40px rgba(0,0,0,.28);
+  transition:opacity .3s var(--ease),transform .55s var(--spring-pop);
+  max-width:calc(100% - 32px);
+}
+.toast.show{opacity:1;transform:translate(-50%,0) scale(1);pointer-events:auto}
+.toast button{border:0;background:none;color:#2997ff;font-weight:600;cursor:pointer;padding:0;font-size:14px;white-space:nowrap}
+
+/* ---------- Диалог в стиле iOS ---------- */
+.dlg-wrap{
+  position:fixed;inset:0;z-index:60;display:grid;place-items:center;padding:20px;
+  background:rgba(0,0,0,0);
+  transition:background .35s var(--ease),-webkit-backdrop-filter .35s,backdrop-filter .35s;
+}
+.dlg-wrap.show{background:rgba(0,0,0,.3);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.dlg{
+  width:min(340px,100%);background:var(--panel-elev);border-radius:22px;
+  padding:24px 20px 16px;text-align:center;
+  box-shadow:0 30px 80px rgba(0,0,0,.3);
+  transform:scale(1.12);opacity:0;
+  transition:transform .5s var(--spring),opacity .25s var(--ease);
+}
+.dlg-wrap.show .dlg{transform:scale(1);opacity:1}
+.dlg h4{margin:0;font-size:17px;font-weight:600;letter-spacing:-.022em}
+.dlg p{margin:8px 0 0;font-size:14px;color:var(--muted);line-height:1.45}
+.dlg-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:20px}
+.dlg-actions .btn{height:44px;border-radius:12px;font-weight:600}
+
+/* =========================================================
+   ЛИСТ НАКЛАДНОЙ (A4) — цвета фиксированы, не зависят от темы
+   ========================================================= */
+.sheet{
+  --ink:#1d1d1f;
+  --grey:#86868b;
+  --soft:#515154;
+  --line:#e5e5ea;
+  position:absolute;top:0;left:0;
+  width:210mm;min-height:297mm;
+  padding:16mm 16mm 13mm;
+  background:#fff;color:var(--ink);
+  font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+  font-size:9pt;line-height:1.4;letter-spacing:-.005em;
+  display:flex;flex-direction:column;
+  transform-origin:0 0;
+}
+.sh-top{display:flex;justify-content:space-between;align-items:center;gap:20px;padding-bottom:13mm}
+.sh-brand{display:flex;align-items:center;gap:4mm;min-width:0}
+.sh-logo{height:12mm;display:flex;align-items:center;flex-shrink:0}
+.sh-logo svg,.sh-logo img{height:100%;width:auto;max-width:45mm;object-fit:contain}
+.sh-company{font-weight:600;font-size:11pt;letter-spacing:-.015em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sh-badge{
+  display:inline-block;border:1px solid var(--ink);color:var(--ink);
+  font-weight:600;font-size:6.5pt;letter-spacing:.14em;text-transform:uppercase;
+  padding:3px 11px;border-radius:999px;flex-shrink:0;
+}
+.sh-badge.copy{border-color:#c7c7cc;color:var(--grey)}
+.sh-title{font-size:32pt;font-weight:700;letter-spacing:-.035em;line-height:1;margin-bottom:8mm}
+.sh-info{
+  display:grid;grid-template-columns:1fr 1fr 2fr;gap:6mm;
+  padding:4mm 0;margin-bottom:9mm;
+  border-top:1.2px solid var(--ink);border-bottom:1px solid var(--line);
+}
+.sh-label{font-size:6.3pt;font-weight:600;color:var(--grey);letter-spacing:.12em;text-transform:uppercase;margin-bottom:1.3mm}
+.sh-value{font-size:10pt;font-weight:600;letter-spacing:-.01em;word-break:break-word}
+.sh-value.empty{color:#c7c7cc;font-weight:500}
+
+.sh-table{width:100%;border-collapse:collapse;font-size:8.6pt}
+.sh-table thead{display:table-header-group}
+.sh-table thead th{
+  font-size:6.3pt;font-weight:600;color:var(--grey);letter-spacing:.1em;text-transform:uppercase;
+  text-align:left;padding:0 8px 2.5mm;white-space:nowrap;
+  border-bottom:1px solid var(--ink);
+}
+.sh-table td{padding:2.7mm 8px;border-bottom:1px solid var(--line);vertical-align:top}
+.sh-table th:first-child,.sh-table td:first-child{padding-left:0}
+.sh-table th:last-child,.sh-table td:last-child{padding-right:0}
+.sh-table tr{break-inside:avoid;page-break-inside:avoid}
+.sh-table .r{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.sh-table th.r{text-align:right}
+.sh-table .c-n{width:6%;color:var(--grey)}
+.sh-table .c-u{width:10%;color:var(--soft)}
+.sh-table .c-q{width:11%}
+.sh-table .c-p{width:14%}
+.sh-table .c-s{width:16%;font-weight:600}
+.sh-table td.nm{word-break:break-word;font-weight:500}
+.sh-table tr.empty td{text-align:center;color:#aeaeb2;padding:16px;font-weight:400}
+
+.sh-sum{display:flex;align-items:flex-start;gap:10mm;margin-top:6mm;break-inside:avoid;page-break-inside:avoid}
+.sh-comment{flex:1;min-width:0;padding-top:1.3mm}
+.sh-comment-text{font-size:8.3pt;color:var(--soft);white-space:pre-wrap;word-break:break-word;line-height:1.5}
+.sh-totals{width:52%;margin-left:auto;flex-shrink:0;font-size:8.6pt}
+.t-row{display:flex;justify-content:space-between;gap:10px;padding:1.3mm 0;color:var(--soft)}
+.t-row span:last-child{color:var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap}
+.t-total{
+  display:flex;justify-content:space-between;align-items:baseline;gap:10px;
+  border-top:1.2px solid var(--ink);margin-top:2.5mm;padding-top:3.5mm;
+}
+.t-total span:first-child{font-size:9pt;font-weight:600}
+.t-total span:last-child{font-size:17pt;font-weight:700;letter-spacing:-.03em;white-space:nowrap;font-variant-numeric:tabular-nums}
+.sh-words{text-align:right;color:var(--grey);font-size:7.5pt;margin-top:2mm;break-inside:avoid}
+
+.sh-foot{margin-top:auto;padding-top:18mm;break-inside:avoid;page-break-inside:avoid}
+.sh-signs{display:grid;grid-template-columns:1fr 1fr;gap:14mm}
+.sign{position:relative}
+.sign-label{font-size:6.3pt;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--grey);margin-bottom:9mm;position:relative;z-index:1}
+.sign-line{border-bottom:1px solid var(--ink)}
+.sign-cap{display:flex;justify-content:space-between;font-size:6.5pt;color:var(--grey);margin-top:1.5mm}
+.sh-stamp{
+  position:absolute;right:4mm;top:-9mm;
+  width:27mm;height:27mm;
+  color:#2f6fc0;opacity:.82;transform:rotate(-9deg);
+  pointer-events:none;z-index:2;mix-blend-mode:multiply;
+}
+.sh-stamp svg,.sh-stamp img{width:100%;height:100%;object-fit:contain}
+.sh-note{font-size:6.3pt;color:#aeaeb2;margin-top:6mm;padding-top:3mm;border-top:1px solid var(--line)}
+.sh-note:empty{display:none}
+
+/* =========================================================
+   АДАПТИВ
+   ========================================================= */
+@media (max-width:980px){
+  .layout{grid-template-columns:1fr}
+  .tabs{display:flex}
+  body[data-view="edit"] .preview{display:none}
+  body[data-view="preview"] .editor{display:none}
+  .editor{padding:20px 16px 40px;max-width:640px;width:100%;margin:0 auto}
+  .preview{padding:16px}
+}
+@media (max-width:640px){
+  .app-bar{padding:0 16px;gap:8px}
+  .brand-sub{display:none}
+  .btn-text{display:none}
+  .bar-actions .btn{width:36px;padding:0}
+  .bar-actions .btn-primary{width:auto;padding:0 14px}
+  .bar-actions .btn-primary .btn-text{display:inline}
+  .ed-head h1{font-size:24px}
+}
+@media (max-width:440px){
+  .item-grid{grid-template-columns:1fr 1fr;padding-left:0}
+  .grid2{grid-template-columns:1fr}
+  .brand-text{display:none}
+  .grand-value{font-size:30px}
+  .stat-value{font-size:18px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none !important;transition:none !important}
+}
+
+/* =========================================================
+   ПЕЧАТЬ / PDF
+   ========================================================= */
+@media print{
+  @page{size:A4;margin:12mm 13mm}
+  html,body{background:#fff !important;height:auto !important;overflow:visible !important}
+  .app{display:block;height:auto}
+  .app-bar,.tabs,.editor,.pv-toolbar,.toast,.dlg-wrap{display:none !important}
+  .layout{display:block !important}
+  .preview{display:block !important;padding:0 !important;overflow:visible !important;background:none !important}
+  .pv-inner{display:block;width:auto}
+  .sheet-holder{width:auto !important;height:auto !important;overflow:visible !important;box-shadow:none !important;border-radius:0;animation:none !important}
+  .sheet{position:static;transform:none !important;width:auto;min-height:271mm;padding:0}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body data-view="edit" class="intro">
+<div class="app">
+
+  <!-- ===== Верхняя панель ===== -->
+  <header class="app-bar" id="appBar">
+    <div class="brand">
+      <div class="brand-mark" id="brandMark"></div>
+      <div class="brand-text">
+        <div class="bt-default">
+          <div class="brand-title">Накладные</div>
+          <div class="brand-sub" id="brandSub">Mezon Print</div>
+        </div>
+        <div class="bt-compact" aria-hidden="true">
+          <span id="barNum"></span><span id="barTotal"></span>
+        </div>
+      </div>
+    </div>
+    <div class="bar-actions">
+      <button class="btn" id="btnNew" title="Новая накладная" aria-label="Новая накладная">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        <span class="btn-text">Новая</span>
+      </button>
+      <button class="btn" id="btnSave" title="Сохранить (Ctrl+S)" aria-label="Сохранить">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+        <span class="btn-text">Сохранить</span>
+      </button>
+      <button class="btn btn-primary" id="btnPrint" title="Печать или сохранение в PDF (Ctrl+P)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>
+        <span class="btn-text">Печать / PDF</span>
+      </button>
+    </div>
+  </header>
+
+  <nav class="tabs" id="tabs">
+    <div class="seg" id="tabsSeg">
+      <button type="button" data-v="edit" class="on">Редактор</button>
+      <button type="button" data-v="preview">Просмотр</button>
+    </div>
+  </nav>
+
+  <main class="layout">
+    <!-- ===== Редактор ===== -->
+    <aside class="editor" id="editor">
+
+      <div class="ed-head">
+        <h1 id="edTitle">Накладная</h1>
+        <p id="edSub">Заполните данные — документ обновляется сразу.</p>
+      </div>
+
+      <section class="card">
+        <h3>Документ</h3>
+        <div class="field">
+          <label for="fNumber">Номер накладной</label>
+          <div class="row">
+            <input class="in" id="fNumber" autocomplete="off" spellcheck="false">
+            <button type="button" class="icon-btn filled" id="btnRegen" title="Сгенерировать номер заново" aria-label="Сгенерировать номер заново">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="grid2">
+          <div class="field">
+            <label for="fDate">Дата</label>
+            <input class="in" type="date" id="fDate">
+          </div>
+          <div class="field">
+            <span class="lbl">Экземпляр</span>
+            <div class="seg" id="fStatus" role="group" aria-label="Экземпляр">
+              <button type="button" data-v="original">Оригинал</button>
+              <button type="button" data-v="copy">Копия</button>
+            </div>
+          </div>
+        </div>
+        <div class="list-row" style="margin-top:4px">
+          <label for="fPaid">Оплачена</label>
+          <input type="checkbox" class="switch" id="fPaid">
+        </div>
+      </section>
+
+      <section class="card">
+        <h3>Клиент</h3>
+        <input class="in" id="fClient" list="dlClients" placeholder="Компания | Контактное лицо" autocomplete="off" aria-label="Клиент">
+      </section>
+
+      <section class="card">
+        <h3>Позиции <span class="pill" id="itemsCount">0</span></h3>
+        <div id="items"></div>
+        <button type="button" class="btn add-btn" id="btnAddItem">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          Добавить позицию
+        </button>
+
+        <div class="opts">
+          <div class="list-row">
+            <label for="fDisc">Скидка</label>
+            <div class="row-end">
+              <input class="in r disc-in" id="fDisc" inputmode="decimal" placeholder="0" autocomplete="off">
+              <div class="seg mini" id="fDiscType" role="group" aria-label="Тип скидки">
+                <button type="button" data-v="pct">%</button>
+                <button type="button" data-v="sum" id="discCur">сум</button>
+              </div>
+            </div>
+          </div>
+          <div class="list-row">
+            <label for="fVatOn">Начислять НДС</label>
+            <div class="row-end">
+              <div class="vat-rate"><input class="in r" id="fVatRate" inputmode="decimal" aria-label="Ставка НДС"><span>%</span></div>
+              <input type="checkbox" class="switch" id="fVatOn">
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card total-card">
+        <div class="sum-lines">
+          <div><span>Подытог</span><b id="eSub">0</b></div>
+          <div id="eDiscRow"><span id="eDiscLabel">Скидка</span><b id="eDisc">0</b></div>
+          <div id="eVatRow"><span id="eVatLabel">НДС</span><b id="eVat">0</b></div>
+        </div>
+        <div class="grand">
+          <div class="grand-label">Итого к оплате</div>
+          <div class="grand-value" id="eTotal">0</div>
+          <div class="grand-words" id="eWords"></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h3>Примечание</h3>
+        <textarea class="in" id="fNote" rows="3" placeholder="Например: доставка до 15.10, оплата по перечислению" aria-label="Примечание"></textarea>
+        <p class="hint">Печатается на накладной под таблицей.</p>
+      </section>
+
+      <section class="card">
+        <h3>Статистика <span class="pill" id="statsMonth"></span></h3>
+        <div id="statsEmpty" class="empty-note">Сохраните первые накладные — здесь появятся продажи по месяцам.</div>
+        <div id="statsBody" hidden>
+          <div class="stats">
+            <div class="stat">
+              <div class="stat-label">Продажи за месяц</div>
+              <div class="stat-value" id="stSales">0</div>
+              <div class="stat-sub" id="stSalesSub"></div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Накладных</div>
+              <div class="stat-value" id="stCount">0</div>
+              <div class="stat-sub">в этом месяце</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Ждут оплаты</div>
+              <div class="stat-value" id="stUnpaid">0</div>
+              <div class="stat-sub" id="stUnpaidSub"></div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Средний чек</div>
+              <div class="stat-value" id="stAvg">—</div>
+              <div class="stat-sub">в этом месяце</div>
+            </div>
+          </div>
+          <p class="chart-title">Продажи за 6 месяцев</p>
+          <div class="chart" id="chart">
+            <div class="chart-plot" id="chartPlot">
+              <div id="chartGrid"></div>
+              <div class="chart-cols" id="chartCols"></div>
+              <div class="chart-tip" id="chartTip"></div>
+            </div>
+          </div>
+          <details class="chart-table">
+            <summary>Показать таблицей</summary>
+            <table id="chartTable"></table>
+          </details>
+        </div>
+      </section>
+
+      <section class="card">
+        <h3>Сохранённые <span class="pill" id="savedCount">0</span></h3>
+        <div class="saved-tools">
+          <input class="in" id="savedSearch" type="search" placeholder="Поиск по номеру или клиенту" autocomplete="off" aria-label="Поиск">
+          <div class="seg small" id="savedFilter" role="group" aria-label="Фильтр по оплате">
+            <button type="button" data-v="all" class="on">Все</button>
+            <button type="button" data-v="unpaid">Не оплачены</button>
+            <button type="button" data-v="paid">Оплачены</button>
+          </div>
+        </div>
+        <div class="saved-list" id="savedList"></div>
+        <div class="saved-foot">
+          <p class="hint" id="savedSum"></p>
+          <button type="button" class="btn small" id="btnCsv" title="Скачать список в формате CSV для Excel">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>
+            Excel
+          </button>
+        </div>
+      </section>
+
+      <details class="card" id="settingsCard">
+        <summary>
+          <h3>Настройки фирмы
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+          </h3>
+        </summary>
+        <div class="details-body">
+          <div class="field">
+            <label for="sName">Название фирмы</label>
+            <input class="in" id="sName" data-setting="companyName">
+          </div>
+          <div class="grid2">
+            <div class="field">
+              <label for="sPrefix">Префикс номера</label>
+              <input class="in" id="sPrefix" data-setting="prefix" spellcheck="false">
+            </div>
+            <div class="field">
+              <label for="sSeq">Следующий №</label>
+              <input class="in" id="sSeq" type="number" min="1" step="1" data-setting="nextSeq" data-type="int">
+            </div>
+          </div>
+          <div class="grid2">
+            <div class="field">
+              <label for="sCur">Валюта</label>
+              <input class="in" id="sCur" data-setting="currency">
+            </div>
+            <div class="field">
+              <label for="sVat">НДС для новых, %</label>
+              <input class="in" id="sVat" inputmode="decimal" data-setting="vatDefault" data-type="num">
+            </div>
+          </div>
+
+          <div class="sub-section">
+            <div class="field">
+              <span class="lbl">Логотип</span>
+              <div class="asset">
+                <div class="asset-prev" id="logoPrev"></div>
+                <label class="btn small">Загрузить<input type="file" accept="image/*" id="logoFile" hidden></label>
+                <button type="button" class="btn small link" id="logoReset">Сбросить</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="sub-section">
+            <div class="list-row" style="margin-bottom:10px">
+              <label for="sShowStamp">Ставить печать</label>
+              <input type="checkbox" class="switch" id="sShowStamp" data-setting="showStamp">
+            </div>
+            <div class="asset" style="margin-bottom:10px">
+              <div class="asset-prev stamp" id="stampPrev"></div>
+              <label class="btn small">Своя печать<input type="file" accept="image/*" id="stampFile" hidden></label>
+              <button type="button" class="btn small link" id="stampReset">Сбросить</button>
+            </div>
+            <input class="in" id="sStampSub" data-setting="stampSub" placeholder="Текст по кругу печати" aria-label="Текст по кругу печати">
+          </div>
+
+          <div class="sub-section">
+            <div class="field">
+              <label for="sNote">Надпись внизу документа</label>
+              <input class="in" id="sNote" data-setting="footerNote">
+            </div>
+          </div>
+
+          <div class="sub-section">
+            <div class="field">
+              <span class="lbl">Резервная копия</span>
+              <div class="row">
+                <button type="button" class="btn small" id="btnExport">Скачать копию</button>
+                <label class="btn small">Восстановить<input type="file" accept="application/json,.json" id="importFile" hidden></label>
+              </div>
+              <p class="hint">Все накладные хранятся в этом браузере. Время от времени скачивайте копию, чтобы ничего не потерять.</p>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <p class="kbd">
+        <kbd>Ctrl</kbd> + <kbd>S</kbd> сохранить · <kbd>Ctrl</kbd> + <kbd>P</kbd> печать<br>
+        <kbd>Enter</kbd> следующая позиция · <kbd>Alt</kbd> + <kbd>↑</kbd><kbd>↓</kbd> переместить позицию
+      </p>
+    </aside>
+
+    <!-- ===== Предпросмотр ===== -->
+    <section class="preview" id="preview">
+      <div class="pv-inner">
+        <div class="pv-toolbar">
+          <span>Предпросмотр · A4</span>
+          <span class="save-state" id="saveState"></span>
+        </div>
+        <div class="sheet-holder" id="sheetHolder">
+          <div class="sheet" id="sheet">
+            <div class="sh-top">
+              <div class="sh-brand">
+                <div class="sh-logo" id="pvLogo"></div>
+                <div class="sh-company" id="pvCompany"></div>
+              </div>
+              <span class="sh-badge" id="pvBadge">Оригинал</span>
+            </div>
+
+            <div class="sh-title">Накладная</div>
+
+            <div class="sh-info">
+              <div>
+                <div class="sh-label">Номер</div>
+                <div class="sh-value" id="pvNumber"></div>
+              </div>
+              <div>
+                <div class="sh-label">Дата</div>
+                <div class="sh-value" id="pvDate"></div>
+              </div>
+              <div>
+                <div class="sh-label">Клиент</div>
+                <div class="sh-value" id="pvClient"></div>
+              </div>
+            </div>
+
+            <table class="sh-table">
+              <thead>
+                <tr>
+                  <th class="c-n">№</th>
+                  <th>Наименование</th>
+                  <th class="c-u">Ед.</th>
+                  <th class="c-q r">Кол-во</th>
+                  <th class="c-p r">Цена</th>
+                  <th class="c-s r">Сумма</th>
+                </tr>
+              </thead>
+              <tbody id="pvRows"></tbody>
+            </table>
+
+            <div class="sh-sum">
+              <div class="sh-comment" id="pvCommentWrap">
+                <div class="sh-label">Примечание</div>
+                <div class="sh-comment-text" id="pvComment"></div>
+              </div>
+              <div class="sh-totals">
+                <div class="t-row"><span>Всего позиций</span><span id="pvCount"></span></div>
+                <div class="t-row"><span>Общее кол-во</span><span id="pvQty"></span></div>
+                <div class="t-row"><span>Подытог</span><span id="pvSub"></span></div>
+                <div class="t-row" id="pvDiscRow"><span id="pvDiscLabel"></span><span id="pvDisc"></span></div>
+                <div class="t-row" id="pvVatRow"><span id="pvVatLabel"></span><span id="pvVat"></span></div>
+                <div class="t-total"><span>Итого</span><span id="pvTotal"></span></div>
+              </div>
+            </div>
+            <div class="sh-words" id="pvWords"></div>
+
+            <div class="sh-foot">
+              <div class="sh-signs">
+                <div class="sign">
+                  <div class="sh-stamp" id="pvStamp"></div>
+                  <div class="sign-label">От компании</div>
+                  <div class="sign-line"></div>
+                  <div class="sign-cap"><span>Подпись</span><span>М.П.</span></div>
+                </div>
+                <div class="sign">
+                  <div class="sign-label">Клиент (получил)</div>
+                  <div class="sign-line"></div>
+                  <div class="sign-cap"><span>Подпись</span><span>Дата</span></div>
+                </div>
+              </div>
+              <div class="sh-note" id="pvNote"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<datalist id="dlUnits">
+  <option value="шт"></option>
+  <option value="уп"></option>
+  <option value="компл"></option>
+  <option value="лист"></option>
+  <option value="тираж"></option>
+  <option value="м"></option>
+  <option value="м²"></option>
+  <option value="кг"></option>
+  <option value="услуга"></option>
+  <option value="час"></option>
+</datalist>
+<datalist id="dlNames"></datalist>
+<datalist id="dlClients"></datalist>
+
+<div class="toast" id="toast" role="status" aria-live="polite">
+  <span id="toastMsg"></span>
+  <button type="button" id="toastAct" hidden></button>
+</div>
+
+<div class="dlg-wrap" id="dlg" hidden>
+  <div class="dlg" role="alertdialog" aria-modal="true" aria-labelledby="dlgTitle" aria-describedby="dlgText">
+    <h4 id="dlgTitle"></h4>
+    <p id="dlgText"></p>
+    <div class="dlg-actions">
+      <button type="button" class="btn" id="dlgCancel">Отмена</button>
+      <button type="button" class="btn btn-primary" id="dlgOk">ОК</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* =======================================================
+     УТИЛИТЫ
+     ======================================================= */
+  const $  = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+  const NBSP = ' ';
+  const uid = () => Math.random().toString(36).slice(2, 9) + Date.now().toString(36).slice(-5);
+  const pad = n => String(n).padStart(2, '0');
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const round2 = n => Math.round((Number(n) + Number.EPSILON) * 100) / 100;
+  const clone = o => JSON.parse(JSON.stringify(o));
+  const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+
+  const reduced = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const SPRING = 'cubic-bezier(.32,.72,0,1)';
+  const EASE = 'cubic-bezier(.25,.1,.25,1)';
+
+  // "1 000,5" -> 1000.5; "1.000,50" и "1,000.50" -> 1000.5
+  function num(v) {
+    if (typeof v === 'number') return isFinite(v) ? v : 0;
+    let s = String(v == null ? '' : v).replace(/[\s  ']/g, '').replace(/−/g, '-');
+    const commas = (s.match(/,/g) || []).length;
+    const dots = (s.match(/\./g) || []).length;
+    if (commas && dots) {
+      // последний разделитель — десятичный, остальные — разряды
+      const dec = s.lastIndexOf(',') > s.lastIndexOf('.') ? ',' : '.';
+      s = s.split(dec === ',' ? '.' : ',').join('').replace(dec, '.');
+    } else if (commas > 1 || dots > 1) {
+      s = s.replace(/[.,]/g, '');
+    } else {
+      s = s.replace(',', '.');
+    }
+    const n = parseFloat(s);
+    return isFinite(n) ? n : 0;
+  }
+  // 1800000 -> "1 800 000", 15.5 -> "15,50"
+  function fmt(n) {
+    n = round2(n);
+    const neg = n < 0;
+    let [i, f] = Math.abs(n).toFixed(2).split('.');
+    i = i.replace(/\B(?=(\d{3})+(?!\d))/g, NBSP);
+    return (neg ? '−' : '') + i + (f !== '00' ? ',' + f : '');
+  }
+  const fmtInput = n => (n ? fmt(n) : '');
+  const fmtEdit = n => (n ? String(round2(n)).replace('.', ',') : '');
+  // 4688544 -> "4,7 млн"
+  function compact(n) {
+    const a = Math.abs(n);
+    const f = (v, u) => String(Math.round(v * 10) / 10).replace('.', ',') + NBSP + u;
+    if (a >= 1e9) return f(n / 1e9, 'млрд');
+    if (a >= 1e6) return f(n / 1e6, 'млн');
+    if (a >= 1e4) return f(n / 1e3, 'тыс');
+    return fmt(Math.round(n));
+  }
+  function todayISO() {
+    const d = new Date();
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  }
+  function fmtDate(iso) {
+    if (!iso || !/^\d{4}-\d{2}-\d{2}$/.test(iso)) return iso || '';
+    const [y, m, d] = iso.split('-');
+    return `${d}.${m}.${y}`;
+  }
+  const MONTHS_SHORT = ['янв', 'фев', 'мар', 'апр', 'май', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'];
+  const MONTHS = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
+
+  /* =======================================================
+     АНИМАЦИИ
+     ======================================================= */
+  // плавный счётчик чисел
+  function animateNumber(el, to, format) {
+    const from = el._cur;
+    cancelAnimationFrame(el._raf);
+    if (reduced || from == null || from === to) {
+      el._cur = to;
+      el.textContent = format(to);
+      return;
+    }
+    const t0 = performance.now(), dur = 700;
+    const step = t => {
+      const k = Math.min(1, (t - t0) / dur);
+      const e = 1 - Math.pow(1 - k, 4);
+      el._cur = from + (to - from) * e;
+      el.textContent = format(k < 1 ? Math.round(el._cur) : to);
+      if (k < 1) el._raf = requestAnimationFrame(step);
+      else el._cur = to;
+    };
+    el._raf = requestAnimationFrame(step);
+  }
+
+  // появление элемента с раскрытием по высоте
+  function expand(el, dur) {
+    if (reduced || !el) return;
+    const h = el.offsetHeight;
+    el.style.overflow = 'hidden';
+    const a = el.animate([
+      { height: '0px', opacity: 0, transform: 'scale(.97)', paddingTop: '0px', paddingBottom: '0px' },
+      { height: h + 'px', opacity: 1, transform: 'none' }
+    ], { duration: dur || 480, easing: SPRING });
+    a.onfinish = a.oncancel = () => { el.style.overflow = ''; };
+  }
+  // исчезновение со сворачиванием
+  function collapse(el) {
+    return new Promise(res => {
+      if (reduced || !el) { res(); return; }
+      const h = el.offsetHeight;
+      el.style.overflow = 'hidden';
+      el.style.pointerEvents = 'none';
+      const a = el.animate([
+        { height: h + 'px', opacity: 1, transform: 'none' },
+        { height: '0px', opacity: 0, transform: 'scale(.96)', paddingTop: '0px', paddingBottom: '0px', marginTop: '0px', borderBottomWidth: '0px' }
+      ], { duration: 340, easing: EASE, fill: 'forwards' });
+      a.onfinish = () => res();
+    });
+  }
+  // FLIP: элементы плавно переезжают на новые места после перерисовки
+  function flip(container, selector, mutate, enter) {
+    const before = new Map();
+    if (!reduced) $$(selector, container).forEach(el => before.set(el.dataset.id, el.getBoundingClientRect()));
+    mutate();
+    if (reduced) return;
+    $$(selector, container).forEach((el, i) => {
+      const b = before.get(el.dataset.id);
+      if (!b) {
+        if (enter) el.animate([
+          { opacity: 0, transform: 'translateY(8px) scale(.97)' },
+          { opacity: 1, transform: 'none' }
+        ], { duration: 500, easing: SPRING, delay: Math.min(i, 8) * 25, fill: 'backwards' });
+        return;
+      }
+      const a = el.getBoundingClientRect();
+      const dx = b.left - a.left, dy = b.top - a.top;
+      if (Math.abs(dx) < 1 && Math.abs(dy) < 1) return;
+      el.animate([{ transform: `translate(${dx}px,${dy}px)` }, { transform: 'none' }], { duration: 520, easing: SPRING });
+    });
+  }
+
+  // сегментированный переключатель: скользящая плашка
+  function syncSeg(seg) {
+    if (!seg) return;
+    let th = seg.querySelector('.seg-thumb');
+    if (!th) { th = document.createElement('span'); th.className = 'seg-thumb'; seg.prepend(th); }
+    const on = seg.querySelector('button.on');
+    if (!on || !on.offsetWidth) { th.style.opacity = on ? '' : '0'; return; }
+    th.style.opacity = '';
+    th.style.width = on.offsetWidth + 'px';
+    th.style.transform = `translateX(${on.offsetLeft}px)`;
+    if (!seg.classList.contains('ready')) requestAnimationFrame(() => requestAnimationFrame(() => seg.classList.add('ready')));
+  }
+  function setSeg(seg, v) {
+    $$('button', seg).forEach(b => {
+      const on = b.dataset.v === v;
+      b.classList.toggle('on', on);
+      b.setAttribute('aria-pressed', on);
+    });
+    syncSeg(seg);
+  }
+  const syncAllSegs = () => $$('.seg').forEach(syncSeg);
+
+  /* =======================================================
+     СУММА ПРОПИСЬЮ (рус.)
+     ======================================================= */
+  const W = {
+    ones:     ['', 'один', 'два', 'три', 'четыре', 'пять', 'шесть', 'семь', 'восемь', 'девять'],
+    onesF:    ['', 'одна', 'две', 'три', 'четыре', 'пять', 'шесть', 'семь', 'восемь', 'девять'],
+    teens:    ['десять', 'одиннадцать', 'двенадцать', 'тринадцать', 'четырнадцать', 'пятнадцать',
+               'шестнадцать', 'семнадцать', 'восемнадцать', 'девятнадцать'],
+    tens:     ['', '', 'двадцать', 'тридцать', 'сорок', 'пятьдесят', 'шестьдесят', 'семьдесят',
+               'восемьдесят', 'девяносто'],
+    hundreds: ['', 'сто', 'двести', 'триста', 'четыреста', 'пятьсот', 'шестьсот', 'семьсот',
+               'восемьсот', 'девятьсот'],
+    scales: [
+      null,
+      { f: ['тысяча', 'тысячи', 'тысяч'], fem: true },
+      { f: ['миллион', 'миллиона', 'миллионов'] },
+      { f: ['миллиард', 'миллиарда', 'миллиардов'] },
+      { f: ['триллион', 'триллиона', 'триллионов'] }
+    ]
+  };
+  function plural(n, f) {
+    n = Math.abs(n) % 100;
+    const n1 = n % 10;
+    if (n > 10 && n < 20) return f[2];
+    if (n1 > 1 && n1 < 5) return f[1];
+    if (n1 === 1) return f[0];
+    return f[2];
+  }
+  const INV_WORDS = ['накладная', 'накладные', 'накладных'];
+  function triad(n, fem) {
+    const out = [];
+    const h = Math.floor(n / 100), t = Math.floor((n % 100) / 10), o = n % 10;
+    if (h) out.push(W.hundreds[h]);
+    if (t === 1) out.push(W.teens[o]);
+    else {
+      if (t) out.push(W.tens[t]);
+      if (o) out.push((fem ? W.onesF : W.ones)[o]);
+    }
+    return out;
+  }
+  function numToWords(n) {
+    n = Math.floor(Math.abs(n));
+    if (n === 0) return 'ноль';
+    if (n >= 1e15) return fmt(n); // за пределами словаря — цифрами, без потери разрядов
+    const parts = [];
+    let i = 0;
+    while (n > 0) {
+      const tr = n % 1000;
+      if (tr) {
+        const sc = W.scales[i];
+        const w = triad(tr, sc && sc.fem);
+        if (sc) w.push(plural(tr, sc.f));
+        parts.unshift(w.join(' '));
+      }
+      n = Math.floor(n / 1000);
+      i++;
+    }
+    return parts.join(' ');
+  }
+  function minorUnit(cur) {
+    const c = String(cur || '').toLowerCase();
+    if (/сум|so'?m|uzs/.test(c)) return 'тийин';
+    if (/руб|rub|₽/.test(c)) return 'коп.';
+    if (/\$|usd|долл|€|eur|евро/.test(c)) return 'цент.';
+    return '';
+  }
+  function amountInWords(total, cur) {
+    const r = round2(Math.abs(total));
+    const whole = Math.floor(r);
+    const minor = Math.round((r - whole) * 100);
+    let s = numToWords(whole);
+    s = (total < 0 ? 'Минус ' + s : s.charAt(0).toUpperCase() + s.slice(1)) + (cur ? ' ' + cur : '');
+    if (minor) {
+      const mu = minorUnit(cur);
+      s += ' ' + pad(minor) + (mu ? ' ' + mu : '/100');
+    }
+    return s;
+  }
+
+  /* =======================================================
+     ЛОГОТИП И ПЕЧАТЬ ПО УМОЛЧАНИЮ (SVG)
+     ======================================================= */
+  function defaultLogoSVG(ink) {
+    ink = ink || '#111';
+    return `<svg viewBox="0 0 100 58" xmlns="http://www.w3.org/2000/svg" aria-label="mezon print">
+      <text x="0" y="22" font-family="Inter, Arial, sans-serif" font-size="25" font-weight="800" letter-spacing="-1.2" fill="${ink}">mezon</text>
+      <path d="M0 58V42q0-10 10-10h30l-9 26z" fill="#14a39a"/>
+      <path d="M31 58l9-26h11l-9 26z" fill="#e5175f"/>
+      <text x="53" y="54" font-family="Inter, Arial, sans-serif" font-size="15" font-weight="600" letter-spacing="-.3" fill="${ink}">print</text>
+    </svg>`;
+  }
+
+  function stampSVG(name, sub, idSuffix) {
+    const id = 'stampPath-' + idSuffix;
+    const nm = (name || '').trim().toUpperCase() || 'КОМПАНИЯ';
+    const ring = `${nm} ★ ${(sub || '').trim().toUpperCase()} ★ `.replace(/ ★  ★ $/, ' ★ ');
+    const ringFs = Math.max(9, Math.min(17, 440 / (ring.length * 0.7)));
+    const words = nm.split(/\s+/);
+    let lines = [nm];
+    if (words.length > 1) {
+      const mid = Math.ceil(words.length / 2);
+      lines = [words.slice(0, mid).join(' '), words.slice(mid).join(' ')];
+    }
+    const maxLen = Math.max(...lines.map(l => l.length));
+    const fs = Math.max(10, Math.min(22, 100 / (maxLen * 0.66)));
+    const center = lines.length === 2
+      ? `<text x="100" y="${100 - fs * 0.15}" text-anchor="middle" font-size="${fs}" font-weight="800" fill="currentColor">${esc(lines[0])}</text>
+         <text x="100" y="${100 + fs * 0.95}" text-anchor="middle" font-size="${fs}" font-weight="800" fill="currentColor">${esc(lines[1])}</text>`
+      : `<text x="100" y="${100 + fs * 0.36}" text-anchor="middle" font-size="${fs}" font-weight="800" fill="currentColor">${esc(lines[0])}</text>`;
+    return `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" font-family="Arial, Helvetica, sans-serif">
+      <defs><path id="${id}" d="M100,100 m-72,0 a72,72 0 1,1 144,0 a72,72 0 1,1 -144,0"/></defs>
+      <g fill="none" stroke="currentColor">
+        <circle cx="100" cy="100" r="95" stroke-width="4"/>
+        <circle cx="100" cy="100" r="88" stroke-width="1.5"/>
+        <circle cx="100" cy="100" r="58" stroke-width="1.5"/>
+      </g>
+      <text font-size="${ringFs}" font-weight="700" fill="currentColor">
+        <textPath href="#${id}" xlink:href="#${id}" textLength="444" lengthAdjust="spacing">${esc(ring)}</textPath>
+      </text>
+      ${center}
+    </svg>`;
+  }
+
+  /* =======================================================
+     ИКОНКИ ДЛЯ ДИНАМИЧЕСКИХ СТРОК
+     ======================================================= */
+  const ICON = {
+    x:     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>',
+    copy:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg>',
+    trash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>',
+    pay:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg>',
+    grip:  '<svg class="grip" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg>'
+  };
+
+  /* =======================================================
+     ХРАНИЛИЩЕ
+     ======================================================= */
+  const KEYS = { settings: 'mp_settings_v1', invoices: 'mp_invoices_v1', draft: 'mp_draft_v1' };
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } }
+  };
+
+  const DEFAULT_SETTINGS = {
+    companyName: 'Mezon Print',
+    prefix: 'MP',
+    nextSeq: 548,
+    currency: 'сум',
+    vatDefault: 12,
+    logo: null,
+    stamp: null,
+    showStamp: true,
+    stampSub: 'Ташкент • Узбекистан',
+    footerNote: 'Документ сформирован автоматически — Mezon Print'
+  };
+
+  function sanitizeSettings(raw) {
+    const s = Object.assign({}, DEFAULT_SETTINGS, raw && typeof raw === 'object' ? raw : {});
+    s.nextSeq = Math.max(1, parseInt(s.nextSeq, 10) || DEFAULT_SETTINGS.nextSeq);
+    s.vatDefault = num(s.vatDefault);
+    s.showStamp = !!s.showStamp;
+    ['companyName', 'prefix', 'currency', 'stampSub', 'footerNote'].forEach(k => {
+      s[k] = s[k] == null ? '' : String(s[k]);
+    });
+    return s;
+  }
+
+  let settings = sanitizeSettings(store.get(KEYS.settings, {}));
+  let invoices = [];
+  let state = null;
+  let dirty = false;
+  let catalogCache = new Map();
+  let savedFilter = 'all';
+
+  const saveSettings = () => {
+    if (!store.set(KEYS.settings, settings)) toast('Не удалось сохранить настройки: память браузера заполнена');
+  };
+  const saveDraft = () => store.set(KEYS.draft, { inv: state, dirty });
+
+  /* =======================================================
+     МОДЕЛЬ НАКЛАДНОЙ
+     ======================================================= */
+  const blankItem = (unit) => ({ id: uid(), name: '', unit: unit || 'шт', qty: 1, price: 0 });
+
+  function buildNumber(inv) {
+    const p = String(settings.prefix || '').trim();
+    const d = (inv.date || todayISO()).replace(/-/g, '');
+    return (p ? p + '-' : '') + d + '-' + String(inv.seq).padStart(3, '0');
+  }
+
+  function normalize(inv) {
+    inv = inv && typeof inv === 'object' ? inv : {};
+    inv.id = inv.id ? String(inv.id) : uid();
+    inv.seq = parseInt(inv.seq, 10) || settings.nextSeq;
+    inv.date = /^\d{4}-\d{2}-\d{2}$/.test(inv.date) ? inv.date : todayISO();
+    inv.status = inv.status === 'copy' ? 'copy' : 'original';
+    inv.client = inv.client == null ? '' : String(inv.client);
+    inv.vatOn = inv.vatOn !== false;
+    inv.vatRate = inv.vatRate == null ? 12 : num(inv.vatRate);
+    inv.discount = Math.max(0, num(inv.discount));
+    inv.discountType = inv.discountType === 'sum' ? 'sum' : 'pct';
+    inv.note = inv.note == null ? '' : String(inv.note);
+    inv.paid = !!inv.paid;
+    inv.paidAt = inv.paid ? (inv.paidAt || null) : null;
+    inv.numberAuto = !!inv.numberAuto;
+    inv.items = Array.isArray(inv.items) && inv.items.length
+      ? inv.items.filter(it => it && typeof it === 'object').map(it => ({
+          id: it.id || uid(),
+          name: it.name == null ? '' : String(it.name),
+          unit: it.unit == null || it.unit === '' ? 'шт' : String(it.unit),
+          qty: num(it.qty),
+          price: num(it.price)
+        }))
+      : [];
+    if (!inv.items.length) inv.items = [blankItem()];
+    inv.number = String(inv.number || buildNumber(inv));
+    inv.createdAt = inv.createdAt || Date.now();
+    inv.updatedAt = inv.updatedAt || inv.createdAt;
+    return inv;
+  }
+
+  function loadInvoices() {
+    const arr = store.get(KEYS.invoices, []);
+    return Array.isArray(arr) ? arr.filter(x => x && typeof x === 'object').map(x => normalize(x)) : [];
+  }
+  invoices = loadInvoices();
+
+  function demoInvoice() {
+    return {
+      seq: 547, number: 'MP-20260904-547', numberAuto: false, date: '2026-09-04',
+      status: 'original', client: 'Amanat Prestige Hotel | Firuz Khusainov',
+      vatOn: true, vatRate: 12,
+      items: [
+        ['Пригласительный BOX', 'шт', 9, 200000],
+        ['Пригласительный BOX', 'шт', 1, 150000],
+        ['Пригласительный бумажный', 'шт', 20, 15000],
+        ['Лист А4 черно белый печать', 'шт', 1000, 500],
+        ['Бейджик', 'шт', 13, 15000],
+        ['Пакет А4', 'шт', 10, 30000],
+        ['Меню', 'шт', 7, 130000],
+        ['Табличка для WC', 'шт', 2, 15600]
+      ].map(([name, unit, qty, price]) => ({ name, unit, qty, price }))
+    };
+  }
+
+  function newInvoice() {
+    const vd = num(settings.vatDefault);
+    return normalize({
+      seq: settings.nextSeq,
+      numberAuto: true,
+      vatOn: vd > 0,
+      vatRate: vd > 0 ? vd : 12
+    });
+  }
+
+  // подытог → скидка → НДС со суммы после скидки → итого
+  function calc(inv) {
+    const rows = inv.items.filter(it => (it.name || '').trim() || num(it.qty) * num(it.price));
+    let qty = 0, sub = 0;
+    rows.forEach(it => { qty += num(it.qty); sub += round2(num(it.qty) * num(it.price)); });
+    sub = round2(sub);
+    const d = Math.max(0, num(inv.discount));
+    const disc = inv.discountType === 'sum'
+      ? round2(Math.min(d, Math.max(sub, 0)))
+      : round2(sub * clamp(d, 0, 100) / 100);
+    const net = round2(sub - disc);
+    const vat = inv.vatOn ? round2(net * num(inv.vatRate) / 100) : 0;
+    return { rows, count: rows.length, qty: round2(qty), sub, disc, net, vat, total: round2(net + vat) };
+  }
+
+  const isSaved = () => invoices.some(x => x.id === state.id);
+
+  /* =======================================================
+     ОТРИСОВКА: ПРЕДПРОСМОТР
+     ======================================================= */
+  function logoHTML(ink) {
+    return settings.logo ? `<img src="${esc(settings.logo)}" alt="">` : defaultLogoSVG(ink);
+  }
+  function stampHTML(idSuffix) {
+    return settings.stamp
+      ? `<img src="${esc(settings.stamp)}" alt="">`
+      : stampSVG(settings.companyName, settings.stampSub, idSuffix);
+  }
+  const curText = () => settings.currency || '';
+  const withCur = v => curText() ? `${v} ${curText()}` : v;
+  const discLabel = inv => inv.discountType === 'pct' ? `Скидка ${fmt(clamp(inv.discount, 0, 100))}%` : 'Скидка';
+
+  function renderPreview() {
+    const c = calc(state);
+    const cur = curText();
+
+    $('#pvLogo').innerHTML = logoHTML();
+    $('#pvCompany').textContent = settings.companyName || '';
+
+    const badge = $('#pvBadge');
+    badge.textContent = state.status === 'copy' ? 'Копия' : 'Оригинал';
+    badge.classList.toggle('copy', state.status === 'copy');
+
+    $('#pvNumber').textContent = state.number || '—';
+    $('#pvDate').textContent = fmtDate(state.date);
+
+    const client = $('#pvClient');
+    client.textContent = state.client.trim() || 'Не указан';
+    client.classList.toggle('empty', !state.client.trim());
+
+    $('#pvRows').innerHTML = c.rows.length
+      ? c.rows.map((it, i) => `<tr>
+          <td class="c-n">${i + 1}</td>
+          <td class="nm">${esc(it.name)}</td>
+          <td class="c-u">${esc(it.unit)}</td>
+          <td class="r">${fmt(it.qty)}</td>
+          <td class="r">${fmt(it.price)}</td>
+          <td class="r c-s">${fmt(it.qty * it.price)}</td>
+        </tr>`).join('')
+      : '<tr class="empty"><td colspan="6">Добавьте позиции в редакторе</td></tr>';
+
+    const note = state.note.trim();
+    $('#pvCommentWrap').hidden = !note;
+    $('#pvComment').textContent = note;
+
+    $('#pvCount').textContent = c.count;
+    $('#pvQty').textContent = fmt(c.qty);
+    $('#pvSub').textContent = withCur(fmt(c.sub));
+    $('#pvDiscRow').style.display = c.disc ? '' : 'none';
+    $('#pvDiscLabel').textContent = discLabel(state);
+    $('#pvDisc').textContent = '−' + withCur(fmt(c.disc));
+    $('#pvVatRow').style.display = state.vatOn ? '' : 'none';
+    $('#pvVatLabel').textContent = `НДС ${fmt(state.vatRate)}%`;
+    $('#pvVat').textContent = '+' + withCur(fmt(c.vat));
+    $('#pvTotal').textContent = withCur(fmt(c.total));
+    const words = amountInWords(c.total, cur);
+    $('#pvWords').textContent = words;
+
+    $('#pvStamp').innerHTML = settings.showStamp ? stampHTML('sheet') : '';
+    $('#pvNote').textContent = settings.footerNote || '';
+
+    // итоги в редакторе
+    $('#itemsCount').textContent = c.count;
+    $('#eSub').textContent = withCur(fmt(c.sub));
+    $('#eDiscRow').style.display = c.disc ? '' : 'none';
+    $('#eDiscLabel').textContent = discLabel(state);
+    $('#eDisc').textContent = '−' + withCur(fmt(c.disc));
+    $('#eVatRow').style.display = state.vatOn ? '' : 'none';
+    $('#eVatLabel').textContent = `НДС ${fmt(state.vatRate)}%`;
+    $('#eVat').textContent = '+' + withCur(fmt(c.vat));
+    animateNumber($('#eTotal'), c.total, v => withCur(fmt(v)));
+    $('#eWords').textContent = words;
+    $('#discCur').textContent = cur || 'сумма';
+    $('#edTitle').textContent = state.number ? `№ ${state.number}` : 'Накладная';
+    $('#barNum').textContent = state.number || 'Накладная';
+    $('#barTotal').textContent = withCur(fmt(c.total));
+
+    updateSaveState();
+  }
+
+  function renderBrand() {
+    $('#brandMark').innerHTML = logoHTML('currentColor');
+    $('#brandSub').textContent = settings.companyName || '';
+    $('#logoPrev').innerHTML = logoHTML();
+    $('#stampPrev').innerHTML = stampHTML('prev');
+  }
+
+  function updateSaveState() {
+    const el = $('#saveState');
+    const sub = $('#edSub');
+    const paid = state.paid ? ' · оплачена' : '';
+    if (dirty) {
+      el.textContent = 'Есть несохранённые изменения'; el.className = 'save-state warn';
+      sub.textContent = 'Есть несохранённые изменения';
+    } else if (isSaved()) {
+      el.textContent = 'Сохранено'; el.className = 'save-state ok';
+      sub.textContent = 'Сохранено · ' + fmtDate(state.date) + paid;
+    } else {
+      el.textContent = 'Черновик'; el.className = 'save-state';
+      sub.textContent = 'Черновик — заполните данные и сохраните.';
+    }
+  }
+
+  /* =======================================================
+     ОТРИСОВКА: РЕДАКТОР
+     ======================================================= */
+  function fillEditor() {
+    $('#fNumber').value = state.number;
+    $('#fDate').value = state.date;
+    setSeg($('#fStatus'), state.status);
+    $('#fPaid').checked = state.paid;
+    $('#fClient').value = state.client;
+    $('#fVatOn').checked = state.vatOn;
+    $('#fVatRate').value = String(state.vatRate).replace('.', ',');
+    $('#fVatRate').disabled = !state.vatOn;
+    $('#fDisc').value = fmtEdit(state.discount);
+    setSeg($('#fDiscType'), state.discountType);
+    $('#fNote').value = state.note;
+  }
+
+  function fillSettings() {
+    $$('[data-setting]').forEach(el => {
+      const v = settings[el.dataset.setting];
+      if (el.type === 'checkbox') el.checked = !!v;
+      else el.value = v == null ? '' : v;
+    });
+    renderBrand();
+  }
+
+  function renderItems() {
+    $('#items').innerHTML = state.items.map((it, i) => `
+      <div class="item" data-id="${esc(it.id)}">
+        <div class="item-head">
+          <button type="button" class="item-n" title="Перетащите, чтобы изменить порядок (или Alt + ↑/↓)" aria-label="Позиция ${i + 1}, перетащить"><span class="n">${i + 1}</span>${ICON.grip}</button>
+          <input class="in" data-k="name" list="dlNames" placeholder="Наименование" value="${esc(it.name)}" autocomplete="off" aria-label="Наименование">
+          <button type="button" class="icon-btn" data-act="dup" title="Дублировать позицию" aria-label="Дублировать позицию">${ICON.copy}</button>
+          <button type="button" class="icon-btn danger" data-act="del" title="Удалить позицию" aria-label="Удалить позицию">${ICON.x}</button>
+        </div>
+        <div class="item-grid">
+          <label><span>Ед.</span><input class="in" data-k="unit" list="dlUnits" value="${esc(it.unit)}" autocomplete="off"></label>
+          <label><span>Кол-во</span><input class="in r" data-k="qty" inputmode="decimal" value="${fmtInput(it.qty)}" placeholder="0" autocomplete="off"></label>
+          <label><span>Цена</span><input class="in r" data-k="price" inputmode="decimal" value="${fmtInput(it.price)}" placeholder="0" autocomplete="off"></label>
+          <div class="item-sum"><span>Сумма</span><b>${fmt(it.qty * it.price)}</b></div>
+        </div>
+      </div>`).join('');
+  }
+  const itemRow = id => $(`#items .item[data-id="${CSS.escape(id)}"]`);
+
+  function filteredSaved() {
+    const q = ($('#savedSearch').value || '').trim().toLowerCase();
+    return invoices
+      .slice()
+      .sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0))
+      .filter(inv => savedFilter === 'all' || (savedFilter === 'paid') === inv.paid)
+      .filter(inv => !q || `${inv.number} ${inv.client} ${inv.note}`.toLowerCase().includes(q));
+  }
+
+  function renderSaved() {
+    const cur = curText();
+    const arr = filteredSaved();
+    $('#savedCount').textContent = invoices.length;
+    flip($('#savedList'), '.saved', () => {
+      $('#savedList').innerHTML = arr.length
+        ? arr.map(inv => {
+            const c = calc(inv);
+            return `<div class="saved${inv.id === state.id ? ' active' : ''}" data-id="${esc(inv.id)}">
+              <button type="button" class="saved-open" data-act="open" title="Открыть">
+                <span class="s-num">${esc(inv.number)}</span>
+                <span class="s-sum">${fmt(c.total)} ${esc(cur)}</span>
+                <span class="s-client">${esc(inv.client || 'Без клиента')}</span>
+                <span class="s-meta"><i class="s-dot${inv.paid ? ' paid' : ''}"></i>${inv.paid ? 'Оплачена' : 'Не оплачена'} · ${fmtDate(inv.date)}${inv.status === 'copy' ? ' · копия' : ''}</span>
+              </button>
+              <div class="saved-actions">
+              <button type="button" class="icon-btn ok" data-act="pay" title="${inv.paid ? 'Снять отметку об оплате' : 'Отметить как оплаченную'}" aria-label="${inv.paid ? 'Снять отметку об оплате' : 'Отметить как оплаченную'}">${ICON.pay}</button>
+              <button type="button" class="icon-btn" data-act="dup" title="Создать на её основе" aria-label="Создать на её основе">${ICON.copy}</button>
+              <button type="button" class="icon-btn danger" data-act="del" title="Удалить" aria-label="Удалить">${ICON.trash}</button>
+              </div>
+            </div>`;
+          }).join('')
+        : `<div class="empty-note">${invoices.length
+            ? 'Ничего не найдено.'
+            : 'Пока пусто. Нажмите «Сохранить» — накладная появится здесь.'}</div>`;
+    }, true);
+    const total = arr.reduce((s, inv) => s + calc(inv).total, 0);
+    $('#savedSum').textContent = arr.length
+      ? `${arr.length} ${plural(arr.length, INV_WORDS)} на ${withCur(fmt(total))}`
+      : '';
+  }
+
+  function buildCatalog() {
+    const map = new Map();
+    invoices
+      .slice()
+      .sort((a, b) => (a.updatedAt || 0) - (b.updatedAt || 0))
+      .forEach(inv => inv.items.forEach(it => {
+        const n = (it.name || '').trim();
+        if (n) map.set(n.toLowerCase(), { name: n, unit: it.unit, price: it.price });
+      }));
+    return map;
+  }
+
+  function renderDatalists() {
+    catalogCache = buildCatalog();
+    const cur = curText();
+    $('#dlNames').innerHTML = Array.from(catalogCache.values())
+      .map(x => `<option value="${esc(x.name)}" label="${esc(fmt(x.price) + ' ' + cur)}"></option>`).join('');
+    const clients = Array.from(new Set(invoices.map(i => (i.client || '').trim()).filter(Boolean)));
+    $('#dlClients').innerHTML = clients.map(c => `<option value="${esc(c)}"></option>`).join('');
+  }
+
+  /* =======================================================
+     СТАТИСТИКА
+     ======================================================= */
+  let statsMonths = [];
+  function niceCeil(x) {
+    if (x <= 0) return 1;
+    const e = Math.pow(10, Math.floor(Math.log10(x)));
+    const f = x / e;
+    return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 2.5 ? 2.5 : f <= 5 ? 5 : 10) * e;
+  }
+
+  function renderStats() {
+    const has = invoices.length > 0;
+    $('#statsEmpty').hidden = has;
+    $('#statsBody').hidden = !has;
+
+    const now = new Date();
+    const months = [];
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      months.push({ key: `${d.getFullYear()}-${pad(d.getMonth() + 1)}`, m: d.getMonth(), y: d.getFullYear(), sum: 0, count: 0 });
+    }
+    const by = new Map(months.map(x => [x.key, x]));
+    let unpaid = 0, unpaidN = 0;
+    invoices.forEach(inv => {
+      if (inv.status === 'copy') return; // копия — тот же документ, не новая продажа
+      const t = calc(inv).total;
+      const mm = by.get(inv.date.slice(0, 7));
+      if (mm) { mm.sum = round2(mm.sum + t); mm.count++; }
+      if (!inv.paid) { unpaid = round2(unpaid + t); unpaidN++; }
+    });
+    statsMonths = months;
+    const c = months[5], p = months[4];
+    $('#statsMonth').textContent = `${MONTHS[c.m]} ${c.y}`;
+    if (!has) return;
+
+    const money = v => withCur(compact(v));
+    const sales = $('#stSales');
+    sales.title = withCur(fmt(c.sum));
+    animateNumber(sales, c.sum, money);
+    const sub = $('#stSalesSub');
+    if (p.sum > 0) {
+      const d = Math.round((c.sum - p.sum) / p.sum * 100);
+      sub.innerHTML = `<span class="delta ${d >= 0 ? 'up' : 'down'}">${d >= 0 ? '↑' : '↓'} ${Math.abs(d)}%</span> к ${MONTHS_SHORT[p.m]}.`;
+    } else {
+      sub.textContent = MONTHS[c.m].toLowerCase();
+    }
+    animateNumber($('#stCount'), c.count, v => String(Math.round(v)));
+    const un = $('#stUnpaid');
+    un.title = withCur(fmt(unpaid));
+    animateNumber(un, unpaid, money);
+    $('#stUnpaidSub').textContent = unpaidN ? `${unpaidN} ${plural(unpaidN, INV_WORDS)}` : 'всё оплачено';
+    const avg = $('#stAvg');
+    if (c.count) { avg.title = withCur(fmt(c.sum / c.count)); animateNumber(avg, c.sum / c.count, money); }
+    else { avg._cur = null; avg.title = ''; avg.textContent = '—'; }
+
+    // столбчатая диаграмма: одна серия, текущий месяц — акцент
+    const max = niceCeil(Math.max(...months.map(x => x.sum)));
+    $('#chartGrid').innerHTML = [0, max / 2, max]
+      .map(v => `<div class="gl" style="bottom:${v / max * 100}%"><span>${v ? compact(v) : '0'}</span></div>`).join('');
+    $('#chartCols').innerHTML = months.map((x, i) => {
+      const h = x.sum / max * 100;
+      const last = i === months.length - 1;
+      return `<div class="col${last ? ' cur' : ''}" tabindex="0" data-i="${i}"
+          aria-label="${MONTHS[x.m]} ${x.y}: ${fmt(x.sum)} ${esc(curText())}, ${x.count} ${plural(x.count, INV_WORDS)}">
+        <div class="bar" style="height:${h}%;--i:${i}"></div>
+        ${last && x.sum > 0 ? `<span class="col-val" style="bottom:calc(${h}% + 6px)">${compact(x.sum)}</span>` : ''}
+        <span class="col-x">${MONTHS_SHORT[x.m]}</span>
+      </div>`;
+    }).join('');
+    $('#chartTable').innerHTML = `<tr><th>Месяц</th><th class="r">Накладных</th><th class="r">Сумма</th></tr>` +
+      months.map(x => `<tr><td>${MONTHS[x.m]} ${x.y}</td><td class="r">${x.count}</td><td class="r">${withCur(fmt(x.sum))}</td></tr>`).join('');
+    $('#chartTip').classList.remove('show');
+  }
+
+  function showTip(col) {
+    const x = statsMonths[+col.dataset.i];
+    if (!x) return;
+    const tip = $('#chartTip'), plot = $('#chartPlot');
+    tip.innerHTML = `<b>${MONTHS[x.m]} ${x.y}</b><br>${withCur(fmt(x.sum))}<br><span>${x.count} ${plural(x.count, INV_WORDS)}</span>`;
+    const bar = col.querySelector('.bar');
+    const cx = col.offsetLeft + col.offsetWidth / 2;
+    const top = plot.offsetHeight - bar.offsetHeight;
+    const half = tip.offsetWidth / 2;
+    tip.style.left = clamp(cx, half - 52, plot.offsetWidth - half) + 'px';
+    tip.style.top = (top - 8) + 'px';
+    tip.classList.add('show');
+  }
+
+  function renderLibrary() {
+    renderSaved();
+    renderDatalists();
+    renderStats();
+    updateSaveState();
+  }
+
+  function refreshAll() {
+    fillEditor();
+    renderItems();
+    renderPreview();
+    renderSaved();
+    saveDraft();
+  }
+
+  /* =======================================================
+     ДИАЛОГ В СТИЛЕ iOS (вместо системного confirm)
+     ======================================================= */
+  let dlgResolve = null;
+  function ask({ title, text = '', ok = 'Продолжить', cancel = 'Отмена', danger = false }) {
+    if (dlgResolve) dlgResolve(false);
+    const wrap = $('#dlg');
+    $('#dlgTitle').textContent = title;
+    $('#dlgText').textContent = text;
+    $('#dlgText').hidden = !text;
+    const okBtn = $('#dlgOk');
+    okBtn.textContent = ok;
+    okBtn.className = 'btn ' + (danger ? 'btn-danger' : 'btn-primary');
+    $('#dlgCancel').textContent = cancel;
+    const prevFocus = document.activeElement;
+    wrap.hidden = false;
+    requestAnimationFrame(() => requestAnimationFrame(() => wrap.classList.add('show')));
+    okBtn.focus();
+    return new Promise(resolve => {
+      dlgResolve = v => {
+        dlgResolve = null;
+        wrap.classList.remove('show');
+        setTimeout(() => { if (!dlgResolve) wrap.hidden = true; }, reduced ? 0 : 320);
+        if (prevFocus && prevFocus.focus) prevFocus.focus();
+        resolve(v);
+      };
+    });
+  }
+  const dialogOpen = () => !!dlgResolve;
+
+  /* =======================================================
+     ДЕЙСТВИЯ
+     ======================================================= */
+  function changed() {
+    dirty = true;
+    renderPreview();
+    saveDraft();
+  }
+
+  async function confirmDiscard() {
+    return !dirty || ask({
+      title: 'Несохранённые изменения',
+      text: 'Если продолжить, изменения в текущей накладной будут потеряны.',
+      ok: 'Не сохранять', danger: true
+    });
+  }
+
+  function focusItem(index, key) {
+    const rows = $$('#items .item');
+    const row = rows[Math.min(index, rows.length - 1)];
+    if (!row) return;
+    const inp = row.querySelector(`[data-k="${key || 'name'}"]`);
+    inp.focus();
+    inp.scrollIntoView({ block: 'nearest', behavior: reduced ? 'auto' : 'smooth' });
+  }
+
+  function addItem(focus) {
+    const last = state.items[state.items.length - 1];
+    const it = blankItem(last && last.unit);
+    state.items.push(it);
+    renderItems();
+    expand(itemRow(it.id));
+    changed();
+    if (focus) focusItem(state.items.length - 1);
+  }
+
+  function duplicateItem(it) {
+    const idx = state.items.indexOf(it);
+    const copy = Object.assign({}, it, { id: uid() });
+    state.items.splice(idx + 1, 0, copy);
+    flip($('#items'), '.item', renderItems);
+    expand(itemRow(copy.id));
+    changed();
+    focusItem(idx + 1, 'qty');
+  }
+
+  function moveItem(from, to) {
+    if (to < 0 || to >= state.items.length || from === to) return;
+    flip($('#items'), '.item', () => {
+      const [it] = state.items.splice(from, 1);
+      state.items.splice(to, 0, it);
+      renderItems();
+    });
+    changed();
+  }
+
+  function persistInvoices() {
+    return store.set(KEYS.invoices, invoices);
+  }
+
+  function flashSaved() {
+    const b = $('#btnSave'), t = b.querySelector('.btn-text');
+    b.classList.remove('done');
+    void b.offsetWidth;
+    b.classList.add('done');
+    t.textContent = 'Сохранено';
+    clearTimeout(flashSaved.t);
+    flashSaved.t = setTimeout(() => { b.classList.remove('done'); t.textContent = 'Сохранить'; }, 1600);
+  }
+
+  async function saveInvoice() {
+    if (!state.number.trim()) { toast('Укажите номер накладной'); setView('edit'); $('#fNumber').focus(); return; }
+
+    const isNew = !isSaved();
+    // автономер новой накладной мог быть занят (например, из другой вкладки) — берём следующий свободный
+    if (isNew && state.numberAuto) {
+      const used = new Set(invoices.map(x => x.number.trim()));
+      let guard = 0;
+      while (used.has(buildNumber(state)) && guard++ < 10000) state.seq++;
+      state.number = buildNumber(state);
+      $('#fNumber').value = state.number;
+    }
+
+    const twin = invoices.find(x => x.id !== state.id && x.number.trim() === state.number.trim());
+    if (twin && !(await ask({
+      title: `№ ${state.number} уже есть`,
+      text: 'В сохранённых уже есть накладная с таким номером. Всё равно сохранить?',
+      ok: 'Сохранить'
+    }))) return;
+
+    state.updatedAt = Date.now();
+    const copy = clone(state);
+    const i = invoices.findIndex(x => x.id === state.id);
+    const prev = i < 0 ? null : invoices[i];
+    if (i < 0) invoices.push(copy); else invoices[i] = copy;
+
+    if (!persistInvoices()) {
+      if (i < 0) invoices.pop(); else invoices[i] = prev;
+      toast('Не удалось сохранить: память браузера заполнена. Скачайте копию и удалите старые накладные.');
+      return;
+    }
+    if (isNew && state.seq >= settings.nextSeq) {
+      settings.nextSeq = state.seq + 1;
+      saveSettings();
+      $('#sSeq').value = settings.nextSeq;
+    }
+    dirty = false;
+    saveDraft();
+    renderLibrary();
+    renderPreview();
+    flashSaved();
+    toast(`Накладная № ${state.number} сохранена`);
+  }
+
+  function loadInvoice(inv) {
+    state = normalize(clone(inv));
+    dirty = false;
+    refreshAll();
+    $('#editor').scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' });
+  }
+
+  function duplicate(src) {
+    const inv = normalize(clone(src));
+    inv.id = uid();
+    inv.seq = settings.nextSeq;
+    inv.date = todayISO();
+    inv.status = 'original';
+    inv.paid = false;
+    inv.paidAt = null;
+    inv.numberAuto = true;
+    inv.number = buildNumber(inv);
+    inv.items.forEach(it => { it.id = uid(); });
+    inv.createdAt = inv.updatedAt = Date.now();
+    state = inv;
+    dirty = true;
+    refreshAll();
+    $('#editor').scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' });
+    toast('Создана копия на основе выбранной — проверьте и сохраните');
+  }
+
+  function togglePaid(inv) {
+    inv.paid = !inv.paid;
+    inv.paidAt = inv.paid ? Date.now() : null;
+    if (!persistInvoices()) {
+      inv.paid = !inv.paid;
+      toast('Не удалось сохранить отметку об оплате');
+      return;
+    }
+    if (state.id === inv.id) {
+      state.paid = inv.paid;
+      state.paidAt = inv.paidAt;
+      $('#fPaid').checked = state.paid;
+      saveDraft();
+    }
+    renderLibrary();
+    toast(inv.paid ? `№ ${inv.number} — оплачена` : `№ ${inv.number} — ждёт оплаты`);
+  }
+
+  async function deleteInvoice(inv, row) {
+    const idx = invoices.findIndex(x => x.id === inv.id);
+    if (idx < 0) return;
+    await collapse(row);
+    const removed = invoices[idx];
+    invoices.splice(idx, 1);
+    if (!persistInvoices()) {
+      invoices.splice(idx, 0, removed);
+      renderSaved();
+      toast('Не удалось удалить накладную');
+      return;
+    }
+    renderLibrary();
+    toast(`Накладная № ${removed.number} удалена`, {
+      label: 'Отменить',
+      run() {
+        if (invoices.some(x => x.id === removed.id)) return;
+        invoices.splice(Math.min(idx, invoices.length), 0, removed);
+        persistInvoices();
+        renderLibrary();
+        toast('Удаление отменено');
+      }
+    });
+  }
+
+  async function deleteItem(it, row) {
+    if (row.dataset.removing) return;
+    row.dataset.removing = '1';
+    const idx = state.items.indexOf(it);
+    if (idx < 0) return;
+    const wasOnly = state.items.length === 1;
+    await collapse(row);
+    if (wasOnly) state.items = [blankItem(it.unit)];
+    else state.items.splice(idx, 1);
+    renderItems();
+    if (wasOnly) expand(itemRow(state.items[0].id));
+    changed();
+    if (!(it.name || '').trim() && !it.price) return; // пустую строку восстанавливать незачем
+    toast('Позиция удалена', {
+      label: 'Отменить',
+      run() {
+        if (state.items.includes(it)) return;
+        if (wasOnly && state.items.length === 1 && !state.items[0].name && !state.items[0].price) state.items = [];
+        state.items.splice(Math.min(idx, state.items.length), 0, it);
+        flip($('#items'), '.item', renderItems);
+        expand(itemRow(it.id));
+        changed();
+      }
+    });
+  }
+
+  function doPrint() {
+    const old = document.title;
+    document.title = `Накладная ${state.number}`;
+    let done = false;
+    const restore = () => {
+      if (done) return;
+      done = true;
+      document.title = old;
+      window.removeEventListener('afterprint', restore);
+    };
+    window.addEventListener('afterprint', restore);
+    fit();
+    window.print();
+    setTimeout(restore, 1500);
+  }
+
+  function download(name, text, type) {
+    const blob = new Blob([text], { type });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+  }
+
+  function exportBackup() {
+    const data = { app: 'mezon-nakladnye', version: 1, exportedAt: new Date().toISOString(), settings, invoices };
+    download(`nakladnye-backup-${todayISO()}.json`, JSON.stringify(data, null, 2), 'application/json');
+    toast('Резервная копия скачана');
+  }
+
+  // список накладных для Excel (CSV с «;» — так его понимает русский Excel)
+  function exportCSV() {
+    const arr = filteredSaved();
+    if (!arr.length) { toast('Нет накладных для экспорта'); return; }
+    const txt = v => {
+      let s = String(v == null ? '' : v);
+      if (/^[=+\-@]/.test(s)) s = "'" + s; // защита от формул в ячейках
+      return /[";\r\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+    };
+    const n = v => String(round2(v)).replace('.', ',');
+    const head = ['Номер', 'Дата', 'Клиент', 'Экземпляр', 'Позиций', 'Подытог', 'Скидка', 'НДС', 'Итого', 'Валюта', 'Оплата', 'Примечание'];
+    const lines = arr.map(inv => {
+      const c = calc(inv);
+      return [txt(inv.number), fmtDate(inv.date), txt(inv.client), inv.status === 'copy' ? 'Копия' : 'Оригинал',
+        c.count, n(c.sub), n(c.disc), n(c.vat), n(c.total), txt(curText()),
+        inv.paid ? 'Оплачена' : 'Не оплачена', txt(inv.note)].join(';');
+    });
+    download(`nakladnye-${todayISO()}.csv`, '﻿' + [head.join(';')].concat(lines).join('\r\n'), 'text/csv;charset=utf-8');
+    toast(`Выгружено: ${arr.length} ${plural(arr.length, INV_WORDS)}`);
+  }
+
+  async function importBackup(file) {
+    let data;
+    try {
+      data = JSON.parse(await file.text());
+      if (!data || !Array.isArray(data.invoices)) throw new Error('bad');
+    } catch (e) {
+      toast('Не удалось прочитать файл резервной копии');
+      return;
+    }
+    if (!(await ask({
+      title: 'Восстановить из копии?',
+      text: `В файле ${data.invoices.length} ${plural(data.invoices.length, INV_WORDS)}. Совпадающие накладные будут обновлены.`,
+      ok: 'Восстановить'
+    }))) return;
+
+    const prevSettings = settings;
+    const prevInvoices = invoices.slice();
+    if (data.settings && typeof data.settings === 'object') {
+      settings = sanitizeSettings(Object.assign({}, settings, data.settings));
+    }
+    data.invoices.filter(x => x && typeof x === 'object').forEach(raw => {
+      const inv = normalize(clone(raw));
+      const i = invoices.findIndex(x => x.id === inv.id);
+      if (i >= 0) invoices[i] = inv; else invoices.push(inv);
+    });
+    const maxSeq = invoices.reduce((m, x) => Math.max(m, x.seq || 0), 0);
+    if (maxSeq >= settings.nextSeq) settings.nextSeq = maxSeq + 1;
+    if (!persistInvoices()) {
+      settings = prevSettings;
+      invoices = prevInvoices;
+      toast('Не хватает памяти браузера для восстановления');
+      return;
+    }
+    saveSettings();
+    // открытая накладная могла обновиться из копии
+    const fresh = invoices.find(x => x.id === state.id);
+    if (fresh && !dirty) state = normalize(clone(fresh));
+    fillSettings();
+    refreshAll();
+    renderLibrary();
+    toast('Данные восстановлены');
+  }
+
+  // Загрузка картинки с уменьшением (чтобы не переполнить память браузера)
+  function readImage(file, max) {
+    return new Promise((resolve, reject) => {
+      if (!file || !/^image\//.test(file.type)) { reject(new Error('type')); return; }
+      const r = new FileReader();
+      r.onerror = reject;
+      r.onload = () => {
+        if (file.type === 'image/svg+xml') { resolve(r.result); return; }
+        const img = new Image();
+        img.onerror = reject;
+        img.onload = () => {
+          const k = Math.min(1, max / Math.max(img.width, img.height));
+          const c = document.createElement('canvas');
+          c.width = Math.max(1, Math.round(img.width * k));
+          c.height = Math.max(1, Math.round(img.height * k));
+          c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+          resolve(c.toDataURL('image/png'));
+        };
+        img.src = r.result;
+      };
+      r.readAsDataURL(file);
+    });
+  }
+
+  let toastTimer, toastAction = null;
+  function toast(msg, action) {
+    const t = $('#toast'), btn = $('#toastAct');
+    const wasShown = t.classList.contains('show');
+    $('#toastMsg').textContent = msg;
+    toastAction = action || null;
+    btn.hidden = !action;
+    btn.textContent = action ? action.label : '';
+    t.classList.add('show');
+    if (wasShown && !reduced) t.animate([{ transform: 'translate(-50%,0) scale(1.04)' }, { transform: 'translate(-50%,0) scale(1)' }], { duration: 350, easing: SPRING });
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { t.classList.remove('show'); toastAction = null; }, action ? 6000 : 2600);
+  }
+
+  /* =======================================================
+     МАСШТАБ ПРЕДПРОСМОТРА
+     ======================================================= */
+  function fit() {
+    const pv = $('#preview'), holder = $('#sheetHolder'), sheet = $('#sheet');
+    const cs = getComputedStyle(pv);
+    const avail = pv.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+    if (avail <= 0) return;
+    const w = sheet.offsetWidth, h = sheet.offsetHeight;
+    const s = Math.min(1, avail / w);
+    sheet.style.transform = s < 1 ? `scale(${s})` : 'none';
+    holder.style.width = Math.ceil(w * s) + 'px';
+    holder.style.height = Math.ceil(h * s) + 'px';
+  }
+
+  function setView(v) {
+    const was = document.body.dataset.view;
+    document.body.dataset.view = v;
+    setSeg($('#tabsSeg'), v);
+    requestAnimationFrame(fit);
+    // на телефоне — мягкий переход между редактором и предпросмотром
+    if (was !== v && !reduced && getComputedStyle($('#tabs')).display !== 'none') {
+      const pane = v === 'edit' ? $('#editor') : $('#preview');
+      const dir = v === 'edit' ? -1 : 1;
+      pane.animate([
+        { opacity: 0, transform: `translateX(${dir * 24}px)` },
+        { opacity: 1, transform: 'none' }
+      ], { duration: 500, easing: SPRING });
+    }
+  }
+
+  // настройки раскрываются плавно
+  function bindDetails(d) {
+    const s = d.querySelector('summary'), body = d.querySelector('.details-body');
+    let anim = null;
+    s.addEventListener('click', e => {
+      if (reduced) return;
+      e.preventDefault();
+      if (anim) return;
+      body.style.overflow = 'hidden';
+      const end = () => { anim = null; body.style.overflow = ''; };
+      if (!d.open) {
+        d.open = true;
+        const h = body.offsetHeight;
+        anim = body.animate([{ height: '0px', opacity: 0 }, { height: h + 'px', opacity: 1 }], { duration: 520, easing: SPRING });
+        anim.onfinish = end;
+        setTimeout(() => d.scrollIntoView({ block: 'nearest', behavior: 'smooth' }), 200);
+      } else {
+        const h = body.offsetHeight;
+        anim = body.animate([{ height: h + 'px', opacity: 1 }, { height: '0px', opacity: 0 }], { duration: 340, easing: EASE });
+        anim.onfinish = () => { d.open = false; end(); };
+      }
+    });
+  }
+
+  /* =======================================================
+     ПЕРЕТАСКИВАНИЕ ПОЗИЦИЙ
+     ======================================================= */
+  function bindSort(list) {
+    list.addEventListener('pointerdown', e => {
+      const handle = e.target.closest('.item-n');
+      if (!handle || e.button > 0) return;
+      const rows = $$('.item', list);
+      if (rows.length < 2) return;
+      e.preventDefault();
+      const row = handle.closest('.item');
+      const from = rows.indexOf(row);
+      const rects = rows.map(r => r.getBoundingClientRect());
+      const step = rects[from].height;
+      const startY = e.clientY;
+      let to = from, moved = false;
+      handle.setPointerCapture(e.pointerId);
+      list.classList.add('items-sorting');
+      row.classList.add('dragging');
+
+      const move = ev => {
+        const dy = ev.clientY - startY;
+        if (Math.abs(dy) > 3) moved = true;
+        row.style.transform = `translateY(${dy}px)`;
+        const center = rects[from].top + rects[from].height / 2 + dy;
+        to = from;
+        rects.forEach((r, i) => {
+          const mid = r.top + r.height / 2;
+          if (i < from && center < mid) to = Math.min(to, i);
+          if (i > from && center > mid) to = Math.max(to, i);
+        });
+        rows.forEach((r, i) => {
+          if (i === from) return;
+          let shift = 0;
+          if (from < to && i > from && i <= to) shift = -step;
+          if (from > to && i < from && i >= to) shift = step;
+          r.style.transform = shift ? `translateY(${shift}px)` : '';
+        });
+      };
+      const up = () => {
+        handle.removeEventListener('pointermove', move);
+        handle.removeEventListener('pointerup', up);
+        handle.removeEventListener('pointercancel', up);
+        list.classList.remove('items-sorting');
+        if (to !== from) {
+          flip(list, '.item', () => {
+            const [it] = state.items.splice(from, 1);
+            state.items.splice(to, 0, it);
+            renderItems();
+          });
+          changed();
+        } else {
+          row.classList.remove('dragging');
+          if (!reduced && moved) {
+            const cur = row.style.transform;
+            row.style.transform = '';
+            row.animate([{ transform: cur }, { transform: 'none' }], { duration: 400, easing: SPRING });
+          } else row.style.transform = '';
+          rows.forEach(r => { r.style.transform = ''; });
+        }
+      };
+      handle.addEventListener('pointermove', move);
+      handle.addEventListener('pointerup', up);
+      handle.addEventListener('pointercancel', up);
+    });
+  }
+
+  /* =======================================================
+     ОБРАБОТЧИКИ
+     ======================================================= */
+  function bind() {
+    // верхняя панель
+    $('#btnNew').addEventListener('click', async () => {
+      if (!(await confirmDiscard())) return;
+      state = newInvoice();
+      dirty = false;
+      refreshAll();
+      setView('edit');
+      $('#editor').scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' });
+      $('#fClient').focus({ preventScroll: true });
+      toast('Новая накладная');
+    });
+    $('#btnSave').addEventListener('click', saveInvoice);
+    $('#btnPrint').addEventListener('click', doPrint);
+    $$('#tabsSeg button').forEach(b => b.addEventListener('click', () => setView(b.dataset.v)));
+
+    $('#toastAct').addEventListener('click', () => {
+      const a = toastAction;
+      toastAction = null;
+      $('#toast').classList.remove('show');
+      if (a) a.run();
+    });
+
+    // диалог
+    $('#dlgOk').addEventListener('click', () => dlgResolve && dlgResolve(true));
+    $('#dlgCancel').addEventListener('click', () => dlgResolve && dlgResolve(false));
+    $('#dlg').addEventListener('click', e => { if (e.target.id === 'dlg' && dlgResolve) dlgResolve(false); });
+
+    // большой заголовок «уезжает» в верхнюю панель при прокрутке
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(([en]) => {
+        $('#appBar').classList.toggle('scrolled', !en.isIntersecting);
+      }, { root: $('#editor'), threshold: 0 }).observe($('#edTitle'));
+    }
+
+    // документ
+    $('#fNumber').addEventListener('input', e => {
+      state.number = e.target.value;
+      state.numberAuto = false;
+      changed();
+    });
+    $('#btnRegen').addEventListener('click', e => {
+      const b = e.currentTarget;
+      b.classList.remove('spin'); void b.offsetWidth; b.classList.add('spin');
+      if (!isSaved()) state.seq = settings.nextSeq;
+      state.numberAuto = true;
+      state.number = buildNumber(state);
+      $('#fNumber').value = state.number;
+      changed();
+    });
+    $('#fDate').addEventListener('change', e => {
+      state.date = e.target.value || todayISO();
+      e.target.value = state.date;
+      if (state.numberAuto) { state.number = buildNumber(state); $('#fNumber').value = state.number; }
+      changed();
+    });
+    $$('#fStatus button').forEach(b => b.addEventListener('click', () => {
+      if (state.status === b.dataset.v) return;
+      state.status = b.dataset.v;
+      setSeg($('#fStatus'), state.status);
+      changed();
+    }));
+    $('#fPaid').addEventListener('change', e => {
+      state.paid = e.target.checked;
+      state.paidAt = state.paid ? Date.now() : null;
+      changed();
+    });
+    $('#fClient').addEventListener('input', e => { state.client = e.target.value; changed(); });
+    $('#fNote').addEventListener('input', e => { state.note = e.target.value; changed(); });
+    $('#fVatOn').addEventListener('change', e => {
+      state.vatOn = e.target.checked;
+      $('#fVatRate').disabled = !state.vatOn;
+      changed();
+    });
+    $('#fVatRate').addEventListener('input', e => { state.vatRate = num(e.target.value); changed(); });
+    $('#fVatRate').addEventListener('change', e => { e.target.value = String(state.vatRate).replace('.', ','); });
+    $('#fDisc').addEventListener('input', e => { state.discount = Math.max(0, num(e.target.value)); changed(); });
+    $('#fDisc').addEventListener('change', e => {
+      if (state.discountType === 'pct' && state.discount > 100) { state.discount = 100; changed(); }
+      e.target.value = fmtEdit(state.discount);
+    });
+    $$('#fDiscType button').forEach(b => b.addEventListener('click', () => {
+      if (state.discountType === b.dataset.v) return;
+      state.discountType = b.dataset.v;
+      setSeg($('#fDiscType'), state.discountType);
+      changed();
+    }));
+
+    // позиции
+    const list = $('#items');
+    const ctx = e => {
+      const row = e.target.closest('.item');
+      if (!row) return {};
+      return { row, it: state.items.find(x => x.id === row.dataset.id) };
+    };
+    list.addEventListener('input', e => {
+      const { row, it } = ctx(e);
+      const k = e.target.dataset.k;
+      if (!it || !k) return;
+      if (k === 'qty' || k === 'price') {
+        it[k] = num(e.target.value);
+        row.querySelector('.item-sum b').textContent = fmt(it.qty * it.price);
+      } else {
+        it[k] = e.target.value;
+      }
+      changed();
+    });
+    // выбор из списка ранее использованных — подставляем цену и единицу
+    list.addEventListener('change', e => {
+      const { row, it } = ctx(e);
+      if (!it || e.target.dataset.k !== 'name') return;
+      const hit = catalogCache.get(it.name.trim().toLowerCase());
+      if (hit && !it.price) {
+        it.price = hit.price;
+        it.unit = hit.unit || it.unit;
+        row.querySelector('[data-k="price"]').value = fmtInput(it.price);
+        row.querySelector('[data-k="unit"]').value = it.unit;
+        row.querySelector('.item-sum b').textContent = fmt(it.qty * it.price);
+        changed();
+      }
+    });
+    list.addEventListener('focusin', e => {
+      const k = e.target.dataset.k;
+      if (k !== 'qty' && k !== 'price') return;
+      const { it } = ctx(e);
+      if (!it) return;
+      e.target.value = fmtEdit(it[k]);
+      requestAnimationFrame(() => { try { e.target.select(); } catch (_) {} });
+    });
+    list.addEventListener('focusout', e => {
+      const k = e.target.dataset.k;
+      if (k !== 'qty' && k !== 'price') return;
+      const { it } = ctx(e);
+      if (it) e.target.value = fmtInput(it[k]);
+    });
+    list.addEventListener('click', e => {
+      const btn = e.target.closest('[data-act]');
+      if (!btn) return;
+      const { row, it } = ctx(e);
+      if (!it) return;
+      if (btn.dataset.act === 'del') deleteItem(it, row);
+      else if (btn.dataset.act === 'dup') duplicateItem(it);
+    });
+    list.addEventListener('keydown', e => {
+      const k = e.target.dataset.k;
+      const { it } = ctx(e);
+      if (!it) return;
+      const idx = state.items.indexOf(it);
+      // Alt + ↑/↓ — переместить позицию
+      if (e.altKey && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) {
+        e.preventDefault();
+        const to = idx + (e.key === 'ArrowUp' ? -1 : 1);
+        if (to < 0 || to >= state.items.length) return;
+        moveItem(idx, to);
+        focusItem(to, k || 'name');
+        return;
+      }
+      // Enter в последней строке — новая позиция, в остальных — переход к следующей
+      if (e.key !== 'Enter' || e.isComposing || !k) return;
+      e.preventDefault();
+      if (idx === state.items.length - 1) addItem(true);
+      else focusItem(idx + 1);
+    });
+    bindSort(list);
+    $('#btnAddItem').addEventListener('click', () => addItem(true));
+
+    // статистика: подсказки при наведении и фокусе
+    const cols = $('#chartCols');
+    cols.addEventListener('pointerover', e => { const c = e.target.closest('.col'); if (c) showTip(c); });
+    cols.addEventListener('pointerleave', () => $('#chartTip').classList.remove('show'));
+    cols.addEventListener('focusin', e => { const c = e.target.closest('.col'); if (c) showTip(c); });
+    cols.addEventListener('focusout', () => $('#chartTip').classList.remove('show'));
+
+    // сохранённые
+    $('#savedSearch').addEventListener('input', renderSaved);
+    $$('#savedFilter button').forEach(b => b.addEventListener('click', () => {
+      savedFilter = b.dataset.v;
+      setSeg($('#savedFilter'), savedFilter);
+      renderSaved();
+    }));
+    $('#btnCsv').addEventListener('click', exportCSV);
+    $('#savedList').addEventListener('click', async e => {
+      const btn = e.target.closest('[data-act]');
+      if (!btn) return;
+      const row = btn.closest('.saved');
+      const inv = invoices.find(x => x.id === row.dataset.id);
+      if (!inv) return;
+      const act = btn.dataset.act;
+      if (act === 'open') {
+        if (inv.id === state.id && !dirty) return;
+        if (!(await confirmDiscard())) return;
+        loadInvoice(inv);
+        toast(`Открыта накладная № ${inv.number}`);
+      } else if (act === 'dup') {
+        if (!(await confirmDiscard())) return;
+        duplicate(inv);
+      } else if (act === 'pay') {
+        togglePaid(inv);
+      } else if (act === 'del') {
+        deleteInvoice(inv, row);
+      }
+    });
+
+    // настройки
+    bindDetails($('#settingsCard'));
+    $$('[data-setting]').forEach(el => {
+      const k = el.dataset.setting;
+      const ev = el.type === 'checkbox' ? 'change' : 'input';
+      el.addEventListener(ev, () => {
+        let v;
+        if (el.type === 'checkbox') v = el.checked;
+        else if (el.dataset.type === 'int') {
+          const n = parseInt(el.value, 10);
+          if (!(n >= 1)) return; // поле временно пустое — ждём ввода
+          v = n;
+        }
+        else if (el.dataset.type === 'num') v = num(el.value);
+        else v = el.value;
+        settings[k] = v;
+        saveSettings();
+        // номер меняем только у новой (не сохранённой) накладной
+        if ((k === 'prefix' || k === 'nextSeq') && state.numberAuto && !isSaved()) {
+          if (k === 'nextSeq') state.seq = settings.nextSeq;
+          state.number = buildNumber(state);
+          $('#fNumber').value = state.number;
+          saveDraft();
+        }
+        if (k === 'companyName' || k === 'stampSub') renderBrand();
+        if (k === 'currency') { renderSaved(); renderDatalists(); renderStats(); }
+        renderPreview();
+      });
+    });
+    $('#sSeq').addEventListener('change', e => { e.target.value = settings.nextSeq; });
+
+    const bindAsset = (fileSel, resetSel, key, max) => {
+      $(fileSel).addEventListener('change', async e => {
+        const f = e.target.files && e.target.files[0];
+        e.target.value = '';
+        if (!f) return;
+        try {
+          const prev = settings[key];
+          settings[key] = await readImage(f, max);
+          if (!store.set(KEYS.settings, settings)) {
+            settings[key] = prev;
+            toast('Изображение слишком большое для памяти браузера');
+            return;
+          }
+          renderBrand();
+          renderPreview();
+          toast('Изображение загружено');
+        } catch (_) {
+          toast('Не удалось загрузить изображение');
+        }
+      });
+      $(resetSel).addEventListener('click', () => {
+        settings[key] = null;
+        saveSettings();
+        renderBrand();
+        renderPreview();
+      });
+    };
+    bindAsset('#logoFile', '#logoReset', 'logo', 800);
+    bindAsset('#stampFile', '#stampReset', 'stamp', 600);
+
+    $('#btnExport').addEventListener('click', exportBackup);
+    $('#importFile').addEventListener('change', e => {
+      const f = e.target.files && e.target.files[0];
+      e.target.value = '';
+      if (f) importBackup(f);
+    });
+
+    // синхронизация между вкладками — чтобы не перезаписать чужие сохранения
+    window.addEventListener('storage', e => {
+      if (e.key === KEYS.invoices) {
+        invoices = loadInvoices();
+        renderLibrary();
+      } else if (e.key === KEYS.settings) {
+        settings = sanitizeSettings(store.get(KEYS.settings, {}));
+        fillSettings();
+        renderLibrary();
+        renderPreview();
+      }
+    });
+
+    // горячие клавиши
+    document.addEventListener('keydown', e => {
+      if (dialogOpen()) {
+        if (e.key === 'Escape') { e.preventDefault(); dlgResolve(false); }
+        else if ((e.ctrlKey || e.metaKey) && (e.code === 'KeyS' || e.code === 'KeyP')) e.preventDefault();
+        return;
+      }
+      if (!(e.ctrlKey || e.metaKey) || e.altKey) return;
+      if (e.code === 'KeyS') { e.preventDefault(); saveInvoice(); }
+      else if (e.code === 'KeyP') { e.preventDefault(); doPrint(); }
+    });
+
+    // масштаб листа и положение плашек переключателей
+    if ('ResizeObserver' in window) {
+      const ro = new ResizeObserver(() => fit());
+      ro.observe($('#preview'));
+      ro.observe($('#sheet'));
+      const segRO = new ResizeObserver(ents => ents.forEach(en => syncSeg(en.target)));
+      $$('.seg').forEach(s => segRO.observe(s));
+    }
+    window.addEventListener('resize', () => { fit(); syncAllSegs(); });
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { fit(); syncAllSegs(); });
+  }
+
+  /* =======================================================
+     ЗАПУСК
+     ======================================================= */
+  const draft = store.get(KEYS.draft, null);
+  if (draft && draft.inv && Array.isArray(draft.inv.items)) {
+    state = normalize(draft.inv);
+    dirty = !!draft.dirty;
+  } else {
+    state = normalize(demoInvoice());
+    dirty = false;
+  }
+
+  // порядок появления карточек при загрузке
+  $$('.editor > .ed-head, .editor > .card, .editor > .kbd').forEach((el, i) => el.style.setProperty('--i', i));
+
+  bind();
+  fillSettings();
+  setSeg($('#savedFilter'), savedFilter);
+  setSeg($('#tabsSeg'), document.body.dataset.view);
+  refreshAll();
+  renderDatalists();
+  renderStats();
+  fit();
+  setTimeout(() => document.body.classList.remove('intro'), 2000);
+})();
+</script>
+</body>
+</html>
